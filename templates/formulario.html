@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Dimensionamento - LignumCalc</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <style>
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .checkbox-grid div {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-grid input[type="checkbox"] {
+             width: auto;
+             margin-right: 8px;
+             margin-bottom: 0;
+             flex-shrink: 0;
+        }
+        .checkbox-grid label {
+            margin-bottom: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Novo Dimensionamento - LignumCalc (NBR 7190-1:2022)</h1>
+        <p style="text-align: center; margin-bottom: 30px; color: #555;">Insira os dados da peça de madeira e os esforços solicitantes de cálculo para verificação.</p>
+
+        <form action="/calcular" method="post" id="dimensionamento-form" onsubmit="return validarFormulario();">
+
+            <fieldset>
+                <legend>1. Propriedades da Madeira</legend>
+                <div class="form-grid">
+                    <div>
+                        <label for="tipo_tabela">Origem das Propriedades:</label>
+                        <select id="tipo_tabela" name="tipo_tabela" required>
+                            <option value="">Selecione...</option>
+                            <option value="estrutural">Tabela 3 (Peças Estruturais)</option>
+                            <option value="nativa">Tabela 2 (Nativas - CPs Isentos Defeito)</option>
+                        </select>
+                        <span class="error-message" id="tipo_tabela-erro"></span>
+                    </div>
+                    <div>
+                        <label for="classe_madeira">Classe da Madeira:</label>
+                        <select id="classe_madeira" name="classe_madeira" required>
+                            <option value="">Selecione...</option>
+                             </select>
+                        <span class="error-message" id="classe_madeira-erro"></span>
+                    </div>
+                    <div>
+                        <label for="classe_carregamento">Classe de Carregamento:</label>
+                        <select id="classe_carregamento" name="classe_carregamento" required>
+                            <option value="">Selecione...</option>
+                            <option value="permanente">Permanente</option>
+                            <option value="longa">Longa Duração (> 6 meses)</option>
+                            <option value="media">Média Duração (1 sem - 6 meses)</option>
+                            <option value="curta">Curta Duração (< 1 sem)</option>
+                            <option value="instantanea">Instantânea</option>
+                        </select>
+                        <span class="error-message" id="classe_carregamento-erro"></span>
+                    </div>
+                    <div>
+                        <label for="classe_umidade">Classe de Umidade (Local):</label>
+                        <select id="classe_umidade" name="classe_umidade" required>
+                            <option value="">Selecione...</option>
+                            <option value="classe_1">Classe 1 (UR ≤ 65%)</option>
+                            <option value="classe_2">Classe 2 (65% < UR ≤ 75%)</option>
+                            <option value="classe_3">Classe 3 (75% < UR ≤ 85%)</option>
+                            <option value="classe_4">Classe 4 (UR > 85%)</option>
+                        </select>
+                        <span class="error-message" id="classe_umidade-erro"></span>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>2. Geometria e Tipo da Peça</legend>
+                <div class="form-grid">
+                    <div>
+                        <label for="largura_mm">Largura (b) <span class="unidade">[mm]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="largura_mm" name="largura_mm" required placeholder="Ex: 60">
+                        <span class="error-message" id="largura_mm-erro"></span>
+                    </div>
+                    <div>
+                        <label for="altura_mm">Altura (h) <span class="unidade">[mm]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="altura_mm" name="altura_mm" required placeholder="Ex: 140">
+                        <span class="error-message" id="altura_mm-erro"></span>
+                    </div>
+                     <div>
+                        <label for="comprimento">Comprimento (L) <span class="unidade">[m]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="comprimento" name="comprimento" required placeholder="Ex: 3.5">
+                        <span class="error-message" id="comprimento-erro"></span>
+                    </div>
+                     <div>
+                         <label for="tipo_peca_dim">Tipo de Peça (Dim. Mínimas):</label>
+                         <select id="tipo_peca_dim" name="tipo_peca_dim" required>
+                            <option value="principal_isolada" selected title="Peça única fundamental para estabilidade/segurança (viga principal, pilar).">Principal Isolada</option>
+                            <option value="secundaria_isolada" title="Peça única de menor importância, apoiada em principais (terça, barrote).">Secundária Isolada</option>
+                            <option value="principal_multipla" title="Elemento fundamental formado por ≥2 peças justapostas.">Principal Múltipla</option>
+                            <option value="secundaria_multipla" title="Elemento secundário formado por ≥2 peças justapostas.">Secundária Múltipla</option>
+                         </select>
+                         <span class="error-message" id="tipo_peca_dim-erro"></span>
+                         <small>(Define limites de b, h, A - Item 9.2.1)</small>
+                     </div>
+                 </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>3. Esforços Solicitantes de Cálculo (Sd)</legend>
+                 <p style="font-size: 0.9em; color: #555;"><i>(Insira os valores máximos obtidos das combinações de ações. Use 0 se o esforço não existir.)</i></p>
+                 <div class="form-grid">
+                     <div>
+                        <label for="tracao_paralela_sd">Tração Paralela ($N_{sd,t0}$) <span class="unidade">[N]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="tracao_paralela_sd" name="tracao_paralela_sd" required value="0">
+                        <span class="error-message" id="tracao_paralela_sd-erro"></span>
+                    </div>
+                     <div>
+                        <label for="compressao_paralela_sd">Compressão Paralela ($N_{sd,c0}$) <span class="unidade">[N]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="compressao_paralela_sd" name="compressao_paralela_sd" required value="0">
+                        <span class="error-message" id="compressao_paralela_sd-erro"></span>
+                    </div>
+                    <div>
+                        <label for="tracao_perpendicular_sd">Tração Perpendicular ($N_{sd,t90}$) <span class="unidade">[N]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="tracao_perpendicular_sd" name="tracao_perpendicular_sd" required value="0">
+                        <span class="error-message" id="tracao_perpendicular_sd-erro"></span>
+                        <small>(Verificação agora impacta resultado)</small> {# Nota atualizada #}
+                    </div>
+                     <div>
+                        <label for="compressao_perpendicular_sd">Compressão Perpendicular ($N_{sd,c90}$) <span class="unidade">[N]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="compressao_perpendicular_sd" name="compressao_perpendicular_sd" required value="0" placeholder="(Ex: Reação de apoio)">
+                        <span class="error-message" id="compressao_perpendicular_sd-erro"></span>
+                    </div>
+                    <div>
+                        <label for="forca_cortante_sd">Força Cortante ($V_{sd}$) <span class="unidade">[N]</span>:</label>
+                         <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="forca_cortante_sd" name="forca_cortante_sd" required value="0">
+                        <span class="error-message" id="forca_cortante_sd-erro"></span>
+                    </div>
+                     <div>
+                        <label for="momento_x_sd">Momento Fletor ($M_{sd,x}$) <span class="unidade">[N.m]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="momento_x_sd" name="momento_x_sd" required value="0" placeholder="(Em torno do eixo X local)">
+                        <span class="error-message" id="momento_x_sd-erro"></span>
+                    </div>
+                    <div>
+                        <label for="momento_y_sd">Momento Fletor ($M_{sd,y}$) <span class="unidade">[N.m]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="momento_y_sd" name="momento_y_sd" required value="0" placeholder="(Em torno do eixo Y local)">
+                        <span class="error-message" id="momento_y_sd-erro"></span>
+                    </div>
+                 </div>
+            </fieldset>
+
+             <fieldset>
+                <legend>4. Parâmetros de Estabilidade</legend>
+                <div class="form-grid">
+                    <div>
+                        <label for="Ke_x">Coef. Flambagem ($K_{e,x}$):</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="Ke_x" name="Ke_x" required value="1.0">
+                        <span class="error-message" id="Ke_x-erro"></span>
+                        <small>(Relativo ao eixo X local. Ex: 1.0 bi-articulado)</small>
+                    </div>
+                     <div>
+                        <label for="Ke_y">Coef. Flambagem ($K_{e,y}$):</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="Ke_y" name="Ke_y" required value="1.0">
+                        <span class="error-message" id="Ke_y-erro"></span>
+                         <small>(Relativo ao eixo Y local. Ex: 1.0 bi-articulado)</small>
+                    </div>
+                     <div>
+                        <label for="tipo_madeira_beta_c">Tipo para $\beta_c$ (Estabilidade):</label>
+                        <select id="tipo_madeira_beta_c" name="tipo_madeira_beta_c" required>
+                            <option value="serrada" selected>Serrada / Roliça ($\beta_c=0.2$)</option>
+                            <option value="mlc">MLC / MLCC / LVL ($\beta_c=0.1$)</option>
+                        </select>
+                        <span class="error-message" id="tipo_madeira_beta_c-erro"></span>
+                    </div>
+                    <div>
+                        <label for="alpha_n">Fator $\alpha_n$:</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="alpha_n" name="alpha_n" required value="1.0">
+                        <span class="error-message" id="alpha_n-erro"></span>
+                         <small>(Tabela 6 NBR 7190. Usado em $f_{c90,d}$)</small>
+                    </div>
+                    <div>
+                        <label for="L1_mm">Dist. Travamento Lateral Borda Comprimida ($L_1$) <span class="unidade">[mm]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="L1_mm" name="L1_mm" required value="0" placeholder="Entre apoios ou travessas">
+                        <span class="error-message" id="L1_mm-erro"></span>
+                        <small>(Obrigatório > 0 se $M_{sd,x} \ne 0$. Usar L se não houver travamento interm. Ref item 6.5.6)</small>
+                    </div>
+                 </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>5. Verificações a Incluir no Relatório</legend>
+                <p style="font-size: 0.9em; color: #555;"><i>Selecione as verificações que deseja visualizar no relatório final. A estabilidade será incluída automaticamente se houver compressão.</i></p>
+                <div class="checkbox-grid">
+                     <div><input type="checkbox" id="chk_dimensoes" name="verificacoes_selecionadas" value="dimensoes" checked><label for="chk_dimensoes">Dimensões Mínimas</label></div>
+                     <div><input type="checkbox" id="chk_tracao_paralela" name="verificacoes_selecionadas" value="tracao_simples"><label for="chk_tracao_paralela">Tração Paralela</label></div>
+                     <div><input type="checkbox" id="chk_tracao_perpendicular" name="verificacoes_selecionadas" value="tracao_perpendicular"><label for="chk_tracao_perpendicular">Tração Perpendicular</label></div>
+                     <div><input type="checkbox" id="chk_compressao_simples" name="verificacoes_selecionadas" value="compressao_simples_resistencia"><label for="chk_compressao_simples">Compressão Paralela (Resist.)</label></div>
+                     {# Checkbox de estabilidade removido daqui #}
+                     <div><input type="checkbox" id="chk_compressao_perpendicular" name="verificacoes_selecionadas" value="compressao_perpendicular"><label for="chk_compressao_perpendicular">Compressão Perpendicular</label></div>
+                     <div><input type="checkbox" id="chk_flexao_reta" name="verificacoes_selecionadas" value="flexao_simples_reta"><label for="chk_flexao_reta">Flexão Reta</label></div>
+                     <div><input type="checkbox" id="chk_flexao_obliqua" name="verificacoes_selecionadas" value="flexao_obliqua"><label for="chk_flexao_obliqua">Flexão Oblíqua</label></div>
+                     <div><input type="checkbox" id="chk_flexotracao" name="verificacoes_selecionadas" value="flexotracao"><label for="chk_flexotracao">Flexotração</label></div>
+                     <div><input type="checkbox" id="chk_flexocompressao" name="verificacoes_selecionadas" value="flexocompressao"><label for="chk_flexocompressao">Flexocompressão</label></div>
+                     <div><input type="checkbox" id="chk_cisalhamento_vigas" name="verificacoes_selecionadas" value="cisalhamento"><label for="chk_cisalhamento_vigas">Cisalhamento</label></div>
+                     <div><input type="checkbox" id="chk_estabilidade_lateral" name="verificacoes_selecionadas" value="estabilidade_lateral"><label for="chk_estabilidade_lateral">Estabilidade Lateral</label></div>
+                </div>
+                <span class="error-message" id="verificacoes_selecionadas-erro"></span>
+            </fieldset>
+
+            <div class="botao-container">
+                <button type="submit" class="botao botao-principal">Calcular e Verificar</button>
+                <button type="reset" class="botao botao-secundario">Limpar</button>
+                <a href="/" class="botao botao-secundario">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    {# Script Javascript (mantido como estava para validação e população do select) #}
+    <script>
+       // Função de validação principal
+        function validarFormulario() {
+            var formularioValido = true;
+            var primeiroErro = null;
+
+            // IDs dos campos numéricos
+            var camposNumericos = [
+                'largura_mm', 'altura_mm', 'comprimento',
+                'tracao_paralela_sd', 'compressao_paralela_sd', 'tracao_perpendicular_sd',
+                'compressao_perpendicular_sd',
+                'forca_cortante_sd', 'momento_x_sd', 'momento_y_sd',
+                'Ke_x', 'Ke_y', 'alpha_n',
+                'L1_mm'
+            ];
+             // Lista de IDs dos campos de seleção
+             var camposSelect = ['tipo_tabela', 'classe_madeira', 'classe_carregamento', 'classe_umidade', 'tipo_madeira_beta_c', 'tipo_peca_dim'];
+
+            // Limpa todos os erros antes de revalidar
+            [...camposNumericos, ...camposSelect].forEach(function(campoId) {
+                var erroElemento = document.getElementById(campoId + '-erro');
+                if (erroElemento) erroElemento.textContent = '';
+            });
+            var erroCheckbox = document.getElementById('verificacoes_selecionadas-erro');
+            if (erroCheckbox) erroCheckbox.textContent = '';
+
+            // Valida campos numéricos
+            camposNumericos.forEach(function(campoId) {
+                var input = document.getElementById(campoId);
+                var erroElemento = document.getElementById(campoId + '-erro');
+                if (input && erroElemento) {
+                    var permiteZero = true;
+                    var permiteNegativo = false;
+
+                    // Definições específicas por campo (igual à versão anterior)
+                    if (['largura_mm', 'altura_mm', 'comprimento', 'Ke_x', 'Ke_y', 'alpha_n'].includes(campoId)) permiteZero = false;
+                    if (['forca_cortante_sd', 'momento_x_sd', 'momento_y_sd'].includes(campoId)) permiteNegativo = true;
+                    if (campoId === 'L1_mm') {
+                        var momentoXInput = document.getElementById('momento_x_sd');
+                        var momentoXValorStr = momentoXInput ? momentoXInput.value.trim().replace(',', '.') : '0';
+                        var momentoXValor = parseFloat(momentoXValorStr) || 0;
+                         if (Math.abs(momentoXValor) > 1e-6) permiteZero = false;
+                    }
+                    if (['tracao_paralela_sd', 'compressao_paralela_sd', 'tracao_perpendicular_sd', 'compressao_perpendicular_sd'].includes(campoId)) {
+                        permiteZero = true; permiteNegativo = false;
+                    }
+
+                    if (!validarEFormatarNumero(input, erroElemento, permiteZero, permiteNegativo)) {
+                        formularioValido = false;
+                        if(!primeiroErro) primeiroErro = input;
+                    }
+                }
+            });
+
+            // Valida campos de seleção
+            camposSelect.forEach(function(campoId) {
+                var input = document.getElementById(campoId);
+                var erroElemento = document.getElementById(campoId + '-erro');
+                if (input && erroElemento && !validarCampoSelect(input, erroElemento)) {
+                    formularioValido = false;
+                     if(!primeiroErro) primeiroErro = input;
+                }
+            });
+
+            // Valida se ao menos uma checkbox foi selecionada
+            var checkboxes = document.querySelectorAll('input[name="verificacoes_selecionadas"]:checked');
+            if (checkboxes.length === 0) {
+                 var erroCheckboxElement = document.getElementById('verificacoes_selecionadas-erro');
+                 erroCheckboxElement.textContent = 'Selecione ao menos uma verificação para incluir no relatório.';
+                 formularioValido = false;
+                 if (!primeiroErro) {
+                     // Tenta focar no primeiro checkbox do grupo
+                     var primeiroCheckbox = document.querySelector('input[name="verificacoes_selecionadas"]');
+                     if (primeiroCheckbox) primeiroErro = primeiroCheckbox;
+                 }
+            }
+
+
+             // Foca no primeiro campo com erro
+             if (primeiroErro) {
+                 primeiroErro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                 try { primeiroErro.focus(); } catch(e) { console.warn("Não foi possível focar no elemento:", primeiroErro); }
+             }
+
+            return formularioValido;
+        }
+
+        // Função auxiliar para validar e formatar números (igual à versão anterior)
+         function validarEFormatarNumero(input, erroElemento, permitir_zero = true, permitir_negativo = true) {
+            var valor = input.value.trim();
+            var nomeCampo = input.labels[0] ? input.labels[0].innerText.replace(':', '').trim() : input.id;
+
+             if (valor === "") {
+                 if (permitir_zero) { input.value = '0'; erroElemento.textContent = ''; return true; }
+                 else { erroElemento.textContent = `O campo '${nomeCampo}' é obrigatório e não pode ser zero.`; return false; }
+             }
+            var valorFormatado = valor.replace(/\s/g, '').replace(',', '.');
+             var regex_str = permitir_negativo ? '^-?\\d*\\.?\\d+$' : '^\\d*\\.?\\d+$';
+             var regex_num = new RegExp(regex_str);
+             if (!regex_num.test(valorFormatado)) { erroElemento.textContent = `Valor inválido para '${nomeCampo}'. Use números e ponto (.) como separador decimal.`; return false; }
+            var valorFloat = parseFloat(valorFormatado);
+             if (isNaN(valorFloat)) { erroElemento.textContent = `Valor numérico inválido para '${nomeCampo}'.`; return false; }
+             if (!permitir_zero && Math.abs(valorFloat) < 1e-9) { erroElemento.textContent = `O campo '${nomeCampo}' não pode ser zero.`; return false; }
+             if (!permitir_negativo && valorFloat < -1e-9) { erroElemento.textContent = `O campo '${nomeCampo}' não pode ser negativo.`; return false; }
+             // Validação específica de range (igual à versão anterior)
+             if(input.id === 'alpha_n' && (valorFloat < 1.0 || valorFloat > 2.0)) { erroElemento.textContent = '$\alpha_n$ deve estar entre 1.0 e 2.0.'; return false; }
+             if((input.id === 'Ke_x' || input.id === 'Ke_y') && valorFloat < 0.5) { erroElemento.textContent = '$K_e$ deve ser ≥ 0.5.'; return false; }
+             if (input.id === 'L1_mm' && !permitir_zero && valorFloat <= 1e-9) { erroElemento.textContent = '$L_1$ deve ser > 0 quando $M_{sd,x} \ne 0$.'; return false; }
+             if (['largura_mm', 'altura_mm', 'comprimento'].includes(input.id) && valorFloat <= 1e-9) { erroElemento.textContent = `O campo '${nomeCampo}' deve ser maior que zero.`; return false; }
+
+            input.value = valorFormatado;
+            erroElemento.textContent = '';
+            return true;
+        }
+
+        // Função auxiliar para validar seleção (igual à versão anterior)
+        function validarCampoSelect(input, erroElemento) {
+            var nomeCampo = input.labels[0] ? input.labels[0].innerText.replace(':', '').trim() : input.id;
+            if (input.value === '') { erroElemento.textContent = `O campo '${nomeCampo}' é obrigatório.`; return false; }
+            erroElemento.textContent = '';
+            return true;
+        }
+
+        // Adiciona listeners para validação "live" e popula select (igual à versão anterior)
+        document.addEventListener('DOMContentLoaded', function() {
+            var form = document.getElementById('dimensionamento-form');
+            if(!form) return;
+             var inputsParaValidar = form.querySelectorAll('input[type="text"], select');
+             inputsParaValidar.forEach(function(input) {
+                 var eventType = input.tagName === 'SELECT' ? 'change' : 'input';
+                 input.addEventListener(eventType, function() {
+                    var erroElemento = document.getElementById(this.id + '-erro');
+                    if (!erroElemento) return;
+                    if (this.tagName === 'SELECT') {
+                         validarCampoSelect(this, erroElemento);
+                         if (this.id === 'tipo_tabela') { popularClassesMadeira(this.value); }
+                     } else {
+                         var permiteZero = true, permiteNegativo = false;
+                         if (['largura_mm', 'altura_mm', 'comprimento', 'Ke_x', 'Ke_y', 'alpha_n'].includes(this.id)) permiteZero = false;
+                         if (['forca_cortante_sd', 'momento_x_sd', 'momento_y_sd'].includes(this.id)) permiteNegativo = true;
+                         if (this.id === 'L1_mm') {
+                             var mX = parseFloat(document.getElementById('momento_x_sd').value.replace(',','.')) || 0;
+                             if (Math.abs(mX) > 1e-6) permiteZero = false;
+                         }
+                         validarEFormatarNumero(this, erroElemento, permiteZero, permiteNegativo);
+                     }
+                 });
+             });
+             var tipoTabelaInicial = document.getElementById('tipo_tabela').value;
+             popularClassesMadeira(tipoTabelaInicial || '');
+        });
+
+        // Função para popular o select de Classe da Madeira (igual à versão anterior)
+         function popularClassesMadeira(tipo) {
+             var classeSelect = document.getElementById('classe_madeira');
+             var valorAtual = classeSelect.value;
+             classeSelect.innerHTML = '<option value="">Selecione...</option>';
+             var classes = {
+                "estrutural": {
+                    "Coníferas (Tabela 3)": ['C14', 'C16', 'C18', 'C20', 'C22', 'C24', 'C27', 'C30', 'C35', 'C40', 'C45', 'C50'],
+                    "Folhosas (Tabela 3)": ['D18', 'D24', 'D30', 'D35', 'D40', 'D50', 'D60', 'D70']
+                },
+                "nativa": { "Nativas (Tabela 2)": ['D20', 'D30', 'D40', 'D50', 'D60'] }
+             };
+             if (tipo && classes[tipo]) {
+                for (var grupo in classes[tipo]) {
+                    var optgroup = document.createElement('optgroup');
+                    optgroup.label = grupo;
+                    classes[tipo][grupo].forEach(c => { optgroup.appendChild(new Option(c, c)); });
+                    classeSelect.appendChild(optgroup);
+                }
+             }
+             var valorValido = Array.from(classeSelect.options).some(opt => opt.value === valorAtual);
+             classeSelect.value = valorValido ? valorAtual : "";
+             validarCampoSelect(classeSelect, document.getElementById('classe_madeira-erro'));
+         }
+    </script>
+</body>
+</html>

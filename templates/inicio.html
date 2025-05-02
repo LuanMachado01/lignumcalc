@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>LignumCalc - Dimensionamento de Estruturas de Madeira</title>
+    <style>
+        /* Estilo básico para a logo (pode mover para style.css) */
+        .logo-inicio {
+            display: block; /* Para poder centralizar com margem auto */
+            margin: 10px auto 20px auto; /* Ajuste margens */
+            max-width: 500px; /* Mantido 500px da sua versão, ajuste se necessário */
+            height: auto; /* Mantém a proporção da imagem */
+        }
+        /* Estilo para o disclaimer */
+        .disclaimer {
+            font-size: 0.85em; /* Fonte menor */
+            color: #6c757d; /* Cinza */
+            text-align: justify; /* Justificado */
+            margin-top: 20px; /* Espaço acima */
+            padding: 15px;
+            border: 1px solid var(--cor-borda);
+            background-color: #f8f9fa; /* Fundo levemente acinzentado */
+            border-radius: var(--border-radius-padrao);
+        }
+        /* Ajuste para remover margem inferior padrão do último parágrafo */
+        .disclaimer p:last-child {
+             margin-bottom: 0;
+        }
+        /* Ajusta margem do subtítulo caso H1 seja removido */
+        .subtitle {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        /* Centraliza o botão */
+        .botao-container {
+            margin-top: 30px;
+            border-top: none;
+            padding-top: 0;
+            text-align: center; /* Garante centralização */
+        }
+        /* >>> NOVO ESTILO PARA OS AUTORES <<< */
+        .authors {
+            font-size: 0.9em;
+            color: #555; /* Cor mais escura que o disclaimer */
+            text-align: center; /* Centralizado */
+            margin-top: 25px; /* Espaço acima, após o disclaimer */
+            padding-top: 15px;
+            border-top: 1px dashed var(--cor-borda); /* Linha separadora */
+        }
+        .authors span {
+            font-weight: 500; /* Leve negrito para os nomes */
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="LignumCalc Logo" class="logo-inicio">
+
+        <p class="subtitle">Dimensionamento de Estruturas de Madeira (NBR 7190-1:2022)</p>
+
+        <div class="disclaimer">
+            Os autores do programa assim como a Atitus Educação, não possuem responsabilidade
+            alguma por danos causados pelo mau uso do mesmo, ressaltando que o usuário é responsável
+            pela interpretação e conclusão a respeito dos resultados gerados pelo software. Além disso,
+            não é fornecida nenhuma garantia quanto ao funcionamento da ferramenta.<br><br>
+            É recomendável a leitura do manual do usuário antes de efetuar as
+            verificações estruturais realizadas pela ferramenta.
+        </div>
+
+        <div class="authors">
+            <strong>Autores:</strong><br>
+            <span>Luan Carlos Machado dos Santos</span><br>
+            <span>Marinês Silvani Novello</span>
+        </div>
+        <div class="botao-container">
+             <a href="/novo_dimensionamento" class="botao botao-principal">Novo Dimensionamento</a>
+        </div>
+    </div>
+</body>
+
+</html>
