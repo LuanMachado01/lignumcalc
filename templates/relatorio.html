@@ -22,7 +22,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
     <style>
-        /* Estilos como definidos anteriormente */
+        /* Estilos como definidos anteriormente (ou movidos para style.css) */
         .verification-block { border: 1px solid var(--cor-borda); border-left: 5px solid var(--cor-secundaria); padding: 15px 20px; margin-bottom: 20px; border-radius: var(--border-radius-padrao); background-color: #fafdff; }
         .verification-block h4 { margin-top: 0; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px dashed #ccc; color: var(--cor-primaria); font-size: 1.15em; }
         .verification-block h5 { color: #0056b3; margin-top: 15px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dotted #ccc; font-size: 1.05em;} /* Estilo para subtítulos */
@@ -51,6 +51,17 @@
             padding: 0;
             margin-bottom: 5px;
         }
+        /* Adicionado para aviso */
+        .warning-info {
+            font-size: 0.85em;
+            color: #856404; /* Amarelo escuro */
+            background-color: #fff3cd; /* Amarelo claro */
+            border: 1px solid #ffeeba;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: block;
+        }
 
     </style>
 </head>
@@ -74,12 +85,12 @@
             {% if not resultados.geral_ok %}
                 <p><span class="resultado-label" style="min-width: unset;">Verificações Reprovadas:</span></p>
                 <ul>
-                    {# Lista de verificações para o resumo (AGRUPA COMPRESSÃO PURA) #}
+                    {# Lista de verificações para o resumo #}
                     {% set ordem_verificacoes_resumo = [
                          ('dimensoes', 'Dimensões Mínimas'),
                          ('tracao_simples', 'Tração Paralela'),
                          ('tracao_perpendicular', 'Tração Perpendicular'),
-                         ('compressao_pura', 'Compressão Paralela Pura'),
+                         ('compressao_paralela', 'Compressão Paralela'),
                          ('compressao_perpendicular', 'Compressão Perpendicular'),
                          ('flexao_simples_reta', 'Flexão Reta'),
                          ('flexao_obliqua', 'Flexão Oblíqua'),
@@ -91,18 +102,23 @@
                     {% for chave, titulo in ordem_verificacoes_resumo %}
                         {% set mostrar_no_resumo = False %}
                         {% set v_passou = True %}
+                        {% set v_result = None %}
+                        {% set chave_interna_check = chave %}
 
-                        {% if chave == 'compressao_pura' %}
-                            {# Verifica se compressão pura (Resist ou Estab) foi selecionada E se flexocomp NÃO é aplicável #}
-                            {% set res_sel = resultados.mostrar_verificacoes.get('compressao_simples_resistencia') %}
-                            {% set fc_nao_aplic = not resultados.verificacoes.get('flexocompressao',{}).get('verificacao_aplicavel') %}
-                            {% if res_sel and fc_nao_aplic %}
+                        {% if chave == 'compressao_paralela' %}
+                            {# Verifica status combinado de compressao_simples_resistencia e compressao_estabilidade #}
+                            {% set chave_interna_check = 'compressao_simples_resistencia' %} {# Usa a chave interna correta #}
+                            {% if resultados.mostrar_verificacoes.get(chave_interna_check) %} {# Verifica se o checkbox foi marcado #}
                                 {% set v_res = resultados.verificacoes.get('compressao_simples_resistencia',{}) %}
                                 {% set v_est = resultados.verificacoes.get('compressao_estabilidade',{}) %}
                                 {% set res_passou = True if v_res.get('erro') else v_res.get('passou') %}
                                 {% set est_passou = True if v_est.get('erro') else v_est.get('passou') %}
-                                {% set v_passou = (res_passou is not none and res_passou) and (est_passou is not none and est_passou) %}
-                                {% set mostrar_no_resumo = True %}
+                                {# Verifica se a verificação em si é aplicável (força > 0) #}
+                                {% if v_res.get('verificacao_aplicavel') %}
+                                     {# O 'passou' combinado já foi calculado no bloco principal, usamos ele #}
+                                     {% set v_passou = (res_passou is not none and res_passou) and (est_passou is not none and est_passou) %}
+                                     {% set mostrar_no_resumo = True %}
+                                {% endif %}
                             {% endif %}
                         {% elif resultados.mostrar_verificacoes.get(chave) %}
                              {# Lógica para outras verificações #}
@@ -112,19 +128,21 @@
                                  {% elif chave == 'flexao_simples_reta' %}
                                      {% set v_passou = v_result.get('x', {}).get('passou', True) and v_result.get('y', {}).get('passou', True) %}
                                  {% elif chave == 'flexocompressao' %}
-                                      {# *** CORREÇÃO AQUI: Baseia 'passou' no valor agregado no dict *** #}
                                       {% set v_passou = v_result.get('passou', True) %}
                                  {% elif v_result.get('passou') == False %} {% set v_passou = False %}
                                  {% endif %}
-                             {% else %} {% set v_passou = False %}
-                             {% endif %}
-                             {# Só mostra no resumo se for aplicável #}
-                             {% if v_result and v_result.get('verificacao_aplicavel') %}
-                                {% set mostrar_no_resumo = True %}
+
+                                 {# Só mostra no resumo se for aplicável E selecionado #}
+                                 {% if v_result.get('verificacao_aplicavel') %}
+                                    {% set mostrar_no_resumo = True %}
+                                 {% endif %}
+                             {% else %} {# Se v_result não for um dicionário (erro inesperado?) #}
+                                 {% set v_passou = False %}
+                                 {% set mostrar_no_resumo = True %} {# Mostra erro se algo deu errado #}
                              {% endif %}
                         {% endif %}
 
-                        {# Lista se reprovou E era aplicável #}
+                        {# Lista se reprovou E era aplicável E foi selecionado #}
                         {% if mostrar_no_resumo and not v_passou %}
                              <li class="motivo-reprovacao">{{ titulo }}</li>
                         {% endif %}
@@ -184,7 +202,7 @@
             {% set ordem_verificacoes = [
                  'dimensoes', 'tracao_simples', 'tracao_perpendicular',
                  'compressao_simples_resistencia',
-                 'compressao_estabilidade',        
+                 'compressao_estabilidade',
                  'compressao_perpendicular',
                  'flexao_simples_reta', 'flexao_obliqua', 'flexotracao',
                  'flexocompressao',
@@ -196,15 +214,10 @@
             {% for chave in ordem_verificacoes %}
                 {# Lógica condicional para exibir blocos #}
                 {% set v = resultados.verificacoes.get(chave, {}) %}
-                {% set v_fc = resultados.verificacoes.get('flexocompressao', {}) %}
+                {# Verifica se o checkbox foi marcado E se a verificação é aplicável (tem esforço correspondente) #}
                 {% set mostrar_este_bloco = resultados.mostrar_verificacoes.get(chave) and v.get('verificacao_aplicavel') %}
 
-                {# NÃO mostra compressão pura (resist ou estab) se flexocompressão for aplicável #}
-                {% if (chave == 'compressao_simples_resistencia' or chave == 'compressao_estabilidade') and v_fc.get('verificacao_aplicavel') %}
-                    {% set mostrar_este_bloco = False %}
-                {% endif %}
-
-                {# NÃO mostra estabilidade de compressão pura como bloco separado, é parte do de resistência #}
+                {# NÃO mostra estabilidade de compressão pura como bloco separado, ela é incorporada no bloco de resistência #}
                 {% if chave == 'compressao_estabilidade' and resultados.mostrar_verificacoes.get('compressao_simples_resistencia') %}
                      {% set mostrar_este_bloco = False %}
                 {% endif %}
@@ -216,8 +229,7 @@
                          'dimensoes': 'Dimensões Mínimas (Item 9.2.1)',
                          'tracao_simples': 'Tração Paralela às Fibras (Item 6.3.2)',
                          'tracao_perpendicular': 'Tração Perpendicular às Fibras (Item 6.2.3)',
-                         'compressao_simples_resistencia': 'Compressão Paralela Pura (Resistência e Estabilidade)',
-                         'compressao_estabilidade': 'Compressão Paralela (Estabilidade - Item 6.5.5)',
+                         'compressao_simples_resistencia': 'Compressão Paralela (Resistência e Estabilidade)',
                          'compressao_perpendicular': 'Compressão Perpendicular às Fibras (Item 6.3.3)',
                          'flexao_simples_reta': 'Flexão Simples Reta (Item 6.3.4)',
                          'flexao_obliqua': 'Flexão Simples Oblíqua (Item 6.3.5)',
@@ -236,24 +248,32 @@
                         {% set houve_erro_bloco = True %}
                         {% set erro_msg = v.get('erro') %}
                         {% set passou = False %}
+                     {# Caso especial para o bloco combinado de Compressão Paralela #}
                      {% elif chave == 'compressao_simples_resistencia' %}
-                          {# Combina resultado de resistencia e estabilidade para compressão pura #}
                           {% set v_res = v %}
                           {% set v_est = resultados.verificacoes.get('compressao_estabilidade', {}) %}
                           {% set res_passou = v_res.get('passou') %}
+                          {# 'passou' em v_est já considera a esbeltez OK #}
                           {% set est_passou = v_est.get('passou') %}
-                          {% set passou = (res_passou is not none and res_passou) and (est_passou is not none and est_passou) %}
                           {% if v_res.get('erro') or v_est.get('erro') %}
                                 {% set houve_erro_bloco = True %}
                                 {% set erro_msg = (v_res.get('erro') or '') + ' ' + (v_est.get('erro') or '') %}
                                 {% set passou = False %}
+                          {% elif res_passou is none or est_passou is none %}
+                                {# Se um dos resultados não foi calculado (ex: esbeltez falhou), status é N/A ou Falha #}
+                                {% set passou = None %}
+                          {% else %}
+                                {% set passou = res_passou and est_passou %}
                           {% endif %}
                      {% elif chave == 'flexao_simples_reta' %}
-                         {% set passou = v.get('x', {}).get('passou', True) and v.get('y', {}).get('passou', True) %}
-                         {% if v.get('x', {}).get('erro') or v.get('y', {}).get('erro') %}
+                         {% set v_x = v.get('x', {}) %}
+                         {% set v_y = v.get('y', {}) %}
+                         {% if v_x.get('erro') or v_y.get('erro') %}
                              {% set houve_erro_bloco = True %}
-                             {% set erro_msg = (v.get('x', {}).get('erro') or '') + ' ' + (v.get('y', {}).get('erro') or '') %}
+                             {% set erro_msg = (v_x.get('erro') or '') + ' ' + (v_y.get('erro') or '') %}
                              {% set passou = False %}
+                         {% else %}
+                             {% set passou = v_x.get('passou', True) and v_y.get('passou', True) %}
                          {% endif %}
                      {% elif chave == 'flexocompressao' %}
                          {# Usa o 'passou' agregado que já considera resist, estab e esbeltez #}
@@ -264,6 +284,7 @@
                              {% set passou = False %}
                          {% endif %}
                      {% else %}
+                         {# Para os demais casos, pega o status 'passou' diretamente #}
                          {% set passou = v.get('passou') %}
                      {% endif %}
 
@@ -284,7 +305,7 @@
                                  <p><span class="resultado-label">$N_{sd,t0}$:</span> <span class="resultado-valor">{{ '%.2f'|format(v.Nsd) }} N</span></p>
                                  <p><span class="resultado-label">$N_{Rd,t0}$:</span> <span class="resultado-valor">{{ '%.2f'|format(v.NRd) }} N</span></p>
                                  <p><span class="resultado-label">Ratio (Sd/Rd):</span> <span class="resultado-valor">{{ '%.3f'|format(v.Nsd / v.NRd if v.NRd > TOL else 999) }}</span></p>
-                                 {% if v.get('is_combined_case') %}<p class="details-summary">(Verificação realizada, mas caso combinado (Flexotração) pode governar)</p>{% endif %}
+                                 {% if v.get('is_combined_case') %}<p class="warning-info">(Aviso: Caso combinado de Flexotração também é aplicável e pode governar o dimensionamento.)</p>{% endif %}
                              {% endif %}
 
                             {# --- TRAÇÃO PERPENDICULAR --- #}
@@ -299,14 +320,14 @@
                                  <p class="details-summary" style="color: #555;">(Nota: NBR 7190 Item 6.2.3 recomenda não depender desta resistência)</p>
                             {% endif %}
 
-                            {# --- COMPRESSÃO PARALELA PURA (RESIST + ESTAB) --- #}
+                            {# --- COMPRESSÃO PARALELA (RESIST + ESTAB) --- #}
                             {% if chave == 'compressao_simples_resistencia' %}
                                 {% set v_est = resultados.verificacoes.get('compressao_estabilidade', {}) %} {# Pega dados da estabilidade #}
                                 <p><span class="resultado-label">$N_{sd,c0}$:</span> <span class="resultado-valor">{{ '%.2f'|format(v.Nsd) }} N</span></p>
                                 <h5>Resistência da Seção (Item 6.3.3)</h5>
                                 <p><span class="resultado-label">$N_{Rd,c0}$ (Resist.):</span> <span class="resultado-valor">{{ '%.2f'|format(v.NRd) }} N</span></p>
                                 <p><span class="resultado-label">Ratio (Sd/Rd Res.):</span> <span class="resultado-valor">{{ '%.3f'|format(v.Nsd / v.NRd if v.NRd > TOL else 999) }}</span>
-                                   {% if v.get('passou') %} <span class="atende">(OK)</span> {% elif v.get('erro') %} <span class="nao-atende">(ERRO)</span> {% else %} <span class="nao-atende">(FALHA)</span> {% endif %}
+                                   {% if v.get('passou') %} <span class="atende">(OK)</span> {% elif v.get('passou') == False %} <span class="nao-atende">(FALHA)</span> {% else %} <span class="not-applicable">(N/A)</span> {% endif %}
                                 </p>
 
                                 <h5 style="margin-top: 20px;">Estabilidade (Item 6.5.5)</h5>
@@ -316,8 +337,8 @@
                                  <p class="resultado-check">
                                     Limite $\lambda_{max} = {{ '%.2f'|format(lambda_max_cp) }} \le 140$:
                                     {% if v_est.get('esbeltez_ok') %} <span class="atende">(OK)</span>
-                                    {% elif v_est.get('erro') %} <span class="nao-atende">(ERRO)</span>
-                                    {% else %} <span class="nao-atende">(FALHA)</span>
+                                    {% elif v_est.get('esbeltez_ok') == False %} <span class="nao-atende">(FALHA)</span>
+                                    {% else %} <span class="not-applicable">(N/A)</span>
                                     {% endif %}
                                  </p>
                                  {# Só mostra o resto da estabilidade se a esbeltez passou #}
@@ -326,15 +347,17 @@
                                      <p><span class="resultado-label">$\lambda_{rel,y}$:</span> <span class="resultado-valor">{{ '%.3f'|format(v_est.get('lambda_rel_y', 0)) }}</span></p>
                                      <p><span class="resultado-label">$k_{c,x}$:</span> <span class="resultado-valor">{{ '%.3f'|format(v_est.get('kc_x', 1.0)) }}</span></p>
                                      <p><span class="resultado-label">$k_{c,y}$:</span> <span class="resultado-valor">{{ '%.3f'|format(v_est.get('kc_y', 1.0)) }}</span></p>
-                                     <p><span class="resultado-label">$N_{Rd,c0}$ (Estabil.):</span> <span class="resultado-valor">{{ '%.2f'|format(v_est.get('NRd', 0)) }} N</span></p> {# Usa NRd direto de v_est #}
+                                     <p><span class="resultado-label">$N_{Rd,c0}$ (Estabil.):</span> <span class="resultado-valor">{{ '%.2f'|format(v_est.get('NRd', 0)) }} N</span></p>
                                      <p><span class="resultado-label">Ratio (Sd/Rd Estab.):</span> <span class="resultado-valor">{{ '%.3f'|format(v_est.Nsd / v_est.NRd if v_est.NRd > TOL else 999) }}</span>
-                                        {% if v_est.get('passou_est_apenas') %} <span class="atende">(OK)</span> {# 'passou_est_apenas' se precisar diferenciar do 'passou' geral #}
-                                        {% elif v_est.get('erro') %} <span class="nao-atende">(ERRO)</span>
-                                        {% else %} <span class="nao-atende">(FALHA)</span>
+                                        {# 'passou_est_apenas' diferencia do 'passou' geral combinado #}
+                                        {% if v_est.get('passou_est_apenas') %} <span class="atende">(OK)</span>
+                                        {% elif v_est.get('passou_est_apenas') == False %} <span class="nao-atende">(FALHA)</span>
+                                        {% else %} <span class="not-applicable">(N/A)</span>
                                         {% endif %}
                                      </p>
                                  {% endif %}
-                                 {# Status Geral da Compressão Pura já tratado no rodapé do bloco #}
+                                 {# Aviso se Flexocompressão também for aplicável #}
+                                 {% if v.get('is_combined_case') %}<p class="warning-info">(Aviso: Caso combinado de Flexocompressão também é aplicável e pode governar o dimensionamento.)</p>{% endif %}
                             {% endif %}
 
 
@@ -356,16 +379,17 @@
                                 {% if v_x.get('verificacao_aplicavel') %}
                                     <p><span class="resultado-label">$M_{sd,x}$:</span> <span class="resultado-valor">{{ '%.2f'|format(v_x.Msd / 1000) }} N.m</span></p>
                                     <p><span class="resultado-label">$M_{Rd,x}$:</span> <span class="resultado-valor">{{ '%.2f'|format(v_x.MRd / 1000) }} N.m</span>
-                                        {% if v_x.passou %} <span class="atende">(OK Eixo X)</span> {% elif v_x.erro is defined %} <span class="nao-atende">(ERRO Eixo X)</span> {% else %} <span class="nao-atende">(FALHA Eixo X)</span> {% endif %}
+                                        {% if v_x.passou %} <span class="atende">(OK Eixo X)</span> {% elif v_x.get('passou') == False %} <span class="nao-atende">(FALHA Eixo X)</span> {% else %} <span class="not-applicable">(N/A)</span> {% endif %}
                                     </p>
                                 {% endif %}
                                 {% if v_y.get('verificacao_aplicavel') %}
                                     <p><span class="resultado-label">$M_{sd,y}$:</span> <span class="resultado-valor">{{ '%.2f'|format(v_y.Msd / 1000) }} N.m</span></p>
                                     <p><span class="resultado-label">$M_{Rd,y}$:</span> <span class="resultado-valor">{{ '%.2f'|format(v_y.MRd / 1000) }} N.m</span>
-                                        {% if v_y.passou %} <span class="atende">(OK Eixo Y)</span> {% elif v_y.erro is defined %} <span class="nao-atende">(ERRO Eixo Y)</span> {% else %} <span class="nao-atende">(FALHA Eixo Y)</span> {% endif %}
+                                        {% if v_y.passou %} <span class="atende">(OK Eixo Y)</span> {% elif v_y.get('passou') == False %} <span class="nao-atende">(FALHA Eixo Y)</span> {% else %} <span class="not-applicable">(N/A)</span> {% endif %}
                                     </p>
                                 {% endif %}
-                                {% if v.get('is_combined_case') %}<p class="details-summary">(Verificação realizada, mas caso combinado (Flexo-T/C) pode governar)</p>{% endif %}
+                                {# Aviso se caso combinado também for aplicável #}
+                                {% if v.get('is_combined_case') %}<p class="warning-info">(Aviso: Caso combinado (Flexotração ou Flexocompressão) também é aplicável e pode governar o dimensionamento.)</p>{% endif %}
                             {% endif %}
 
                             {# --- FLEXÃO OBLÍQUA --- #}
@@ -381,14 +405,12 @@
                              {% endif %}
 
                              {# --- FLEXOCOMPRESSÃO --- #}
-                             {# *** SEÇÃO CORRIGIDA *** #}
                              {% if chave == 'flexocompressao' %}
                                 {% set fc_res = v.get('resistencia', {}) %}
                                 {% set fc_est = v.get('estabilidade', {}) %}
                                 <h5>Verificação da Resistência (Item 6.3.7)</h5>
                                 <p><span class="resultado-label">Resistência Ratio:</span> <span class="resultado-valor">{{ '%.3f'|format(fc_res.get('ratio', 9999)) }}</span>
                                     {% if fc_res.get('passou') %}<span class="atende">(OK)</span>
-                                    {% elif fc_res.get('erro') %}<span class="nao-atende">(ERRO)</span>
                                     {% elif fc_res.get('passou') == False %}<span class="nao-atende">(FALHA)</span>
                                     {% else %}<span class="not-applicable">(N/A)</span>
                                     {% endif %}
@@ -396,37 +418,29 @@
                                 <h5 style="margin-top: 20px;">Verificação da Estabilidade (Item 6.5.5)</h5>
                                  <p><span class="resultado-label">$\lambda_x$:</span> <span class="resultado-valor">{{ '%.2f'|format(fc_est.get('lambda_x', 0)) }}</span></p>
                                  <p><span class="resultado-label">$\lambda_y$:</span> <span class="resultado-valor">{{ '%.2f'|format(fc_est.get('lambda_y', 0)) }}</span></p>
-
-                                 {# USA os valores pré-calculados de lambda_max e esbeltez_ok #}
                                  <p class="resultado-check">
                                      Limite $\lambda_{max} = {{ '%.2f'|format(fc_est.get('lambda_max', -1)) }} \le 140$:
                                      {% if fc_est.get('esbeltez_ok') %}
                                          <span class="atende">(OK)</span>
-                                     {% elif fc_est.get('lambda_max', -1) == -1 or fc_est.get('erro') %} {# Se houve erro no cálculo ou lambda_max não definido #}
-                                         <span class="nao-atende">(ERRO)</span>
+                                     {% elif fc_est.get('lambda_max', -1) == -1 %} {# Se houve erro no cálculo ou lambda_max não definido #}
+                                         <span class="not-applicable">(N/A)</span>
                                      {% else %} {# Se lambda_max > 140 #}
                                          <span class="nao-atende">(FALHA)</span>
                                      {% endif %}
                                  </p>
-
-                                 {# Só mostra o resto se a esbeltez foi OK #}
-                                 {% if fc_est.get('esbeltez_ok') %}
+                                 {% if fc_est.get('esbeltez_ok') %} {# Só mostra ratio se esbeltez ok #}
                                     <p><span class="resultado-label">$\lambda_{rel,x}$:</span> <span class="resultado-valor">{{ '%.3f'|format(fc_est.get('lambda_rel_x', 0)) }}</span></p>
                                     <p><span class="resultado-label">$\lambda_{rel,y}$:</span> <span class="resultado-valor">{{ '%.3f'|format(fc_est.get('lambda_rel_y', 0)) }}</span></p>
                                     <p><span class="resultado-label">$k_{c,x}$:</span> <span class="resultado-valor">{{ '%.3f'|format(fc_est.get('kc_x', 1.0)) }}</span></p>
                                     <p><span class="resultado-label">$k_{c,y}$:</span> <span class="resultado-valor">{{ '%.3f'|format(fc_est.get('kc_y', 1.0)) }}</span></p>
                                     <p><span class="resultado-label">Estabilidade Ratio:</span> <span class="resultado-valor">{{ '%.3f'|format(fc_est.get('ratio', 9999)) }}</span>
-                                        {# Usa 'passou_ratio_apenas' para indicar se o ratio em si passou #}
                                         {% if fc_est.get('passou_ratio_apenas') %} <span class="atende">(OK)</span>
-                                        {% elif fc_est.get('erro') %} <span class="nao-atende">(ERRO)</span>
                                         {% elif fc_est.get('passou_ratio_apenas') == False %} <span class="nao-atende">(FALHA)</span>
                                         {% else %} <span class="not-applicable">(N/A)</span>
                                         {% endif %}
                                     </p>
                                  {% endif %} {# Fim if fc_est.esbeltez_ok #}
                              {% endif %} {# Fim if chave == 'flexocompressao' #}
-                             {# *** FIM DA SEÇÃO CORRIGIDA *** #}
-
 
                              {# --- CISALHAMENTO --- #}
                              {% if chave == 'cisalhamento' %}
@@ -436,7 +450,8 @@
                                  <p><span class="resultado-label">$V_{Rd}$:</span> <span class="resultado-valor">{% if vrd_val is not none %}{{ '%.2f'|format(vrd_val) }}{% else %}Erro{% endif %} N</span></p>
                                  <p><span class="resultado-label">Ratio (Sd/Rd):</span>
                                     <span class="resultado-valor">
-                                    {% if vsd_val is number and vrd_val is number and vrd_val > TOL %}{{ '%.3f'|format(vsd_val|abs / vrd_val) }}{% elif v.get('erro') %}Erro{% else %}N/A{% endif %} {# Usando abs(vsd_val) #}
+                                    {# Usando abs(vsd_val) para o ratio #}
+                                    {% if vsd_val is number and vrd_val is number and vrd_val > TOL %}{{ '%.3f'|format(vsd_val|abs / vrd_val) }}{% elif vrd_val is not none %}N/A{% else %}Erro{% endif %}
                                     </span>
                                  </p>
                              {% endif %}
@@ -460,9 +475,10 @@
                          <div class="verification-summary">
                              Resultado:
                              {% if houve_erro_bloco %} <span class="nao-atende status">ERRO</span>
+                             {% elif v.get('dispensado') %} <span class="atende status">DISPENSADO</span> {# Adicionado caso dispensado #}
                              {% elif passou %} <span class="atende status">APROVADO</span>
                              {% elif passou == False %} <span class="nao-atende status">REPROVADO</span>
-                             {% else %} <span class="not-applicable status">N/A</span> {# Caso 'passou' seja None #}
+                             {% else %} <span class="not-applicable status">N/A</span> {# Caso 'passou' seja None e não seja erro ou dispensado #}
                              {% endif %}
                          </div>
                      </div> {# Fim verification-block #}
@@ -480,7 +496,9 @@
         {# --- 4. Botões --- #}
         <div class="botao-container">
             <a href="/novo_dimensionamento" class="botao botao-principal">Novo Cálculo</a>
+            {# Garante que inputs e verificações existam antes de gerar link #}
             {% if resultados.inputs and resultados.verificacoes_selecionadas is defined %}
+                {# Passa os inputs originais para o memorial detalhado via query string #}
                 {% set url_detalhado = url_for('relatorio_detalhado', **resultados.inputs) %}
                 <a href="{{ url_detalhado }}" class="botao botao-relatorio" target="_blank">Ver Memorial de Cálculo</a>
             {% endif %}
