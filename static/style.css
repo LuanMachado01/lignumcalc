@@ -241,7 +241,6 @@ input:focus, select:focus {
 
 .botao {
     padding: 12px 28px;
-    /* Usa variável para cor do texto, definida em :root */
     color: var(--cor-botao-texto);
     text-decoration: none;
     border-radius: var(--border-radius-padrao);
@@ -265,16 +264,13 @@ input:focus, select:focus {
      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Define cores específicas para cada tipo de botão */
-.botao-principal { background-color: var(--cor-primaria); /* Verde Musgo */ }
-.botao-principal:hover { background-color: #4a633a; /* Verde Musgo Mais Escuro */ }
+.botao-principal { background-color: var(--cor-primaria); }
+.botao-principal:hover { background-color: #4a633a; }
 
-.botao-secundario { background-color: var(--cor-secundaria); /* Marrom Médio */ }
-.botao-secundario:hover { background-color: #876a41; /* Marrom Médio Mais Escuro */ }
+.botao-secundario { background-color: var(--cor-secundaria); }
+.botao-secundario:hover { background-color: #876a41; }
 
-.botao-relatorio { background-color: #8FBC8F; /* Verde Mar Claro */
-                   color: var(--cor-botao-texto-claro); /* Texto escuro para fundo claro */
-}
+.botao-relatorio { background-color: #8FBC8F; color: var(--cor-botao-texto-claro); }
 .botao-relatorio:hover { background-color: #7aae7a; }
 
 
@@ -290,7 +286,7 @@ input:focus, select:focus {
 
 .resultado-secao p, .passo-calculo {
     margin: 8px 0 12px 0;
-    font-size: 1em;
+    font-size: 1em; /* Tamanho base para o texto normal */
     line-height: 1.7;
     display: flex;
     flex-wrap: wrap;
@@ -320,8 +316,8 @@ input:focus, select:focus {
 .passo-calculo .valor {
     font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     font-weight: bold;
-    color: var(--cor-primaria); /* Valor destacado em verde */
-    background-color: #eaf2e5; /* Fundo verde muito claro */
+    color: var(--cor-primaria);
+    background-color: #eaf2e5;
     padding: 2px 6px;
     border-radius: 4px;
     margin-left: 5px;
@@ -356,7 +352,7 @@ input:focus, select:focus {
     display: block;
     width: 100%;
     font-size: 0.85em;
-    color: #5a6f80; /* Mantido cinza azulado ou pode usar --cor-texto-secundario */
+    color: #5a6f80;
     margin-left: 0;
     margin-top: 6px;
     padding-top: 6px;
@@ -370,30 +366,50 @@ input:focus, select:focus {
     margin-bottom: 30px;
     padding: 20px 25px;
     border: 1px solid var(--cor-borda);
-    border-left: 5px solid var(--cor-secundaria); /* Usa marrom médio */
-    background-color: #fdfdfa; /* Bege muito claro */
+    border-left: 5px solid var(--cor-secundaria);
+    background-color: #fdfdfa;
     border-radius: var(--border-radius-padrao);
 }
 .calculo-detalhe h4 {
     margin-top: 0;
-    color: var(--cor-secundaria); /* Marrom médio */
-    border-bottom: 1px solid #e6dccc; /* Borda bege mais escura */
+    color: var(--cor-secundaria);
+    border-bottom: 1px solid #e6dccc;
     padding-bottom: 10px;
     font-size: 1.2em;
     margin-bottom: 20px;
 }
-.latex-formula {
+
+/* --- AJUSTES PARA FÓRMULAS --- */
+/* Classe para fórmulas de bloco (usada em relatorio_detalhado.html via formula-generica) */
+.latex-formula, .formula-generica { /* Aplicando a ambos para garantir */
     display: block;
-    padding: 10px 15px;
-    background-color: #f3efe8; /* Fundo bege um pouco mais escuro */
+    padding: 14px 20px;
+    background-color: #f3efe8;
     border: 1px solid var(--cor-borda);
     border-radius: var(--border-radius-padrao);
-    margin: 15px 0;
-    font-size: 1.1em;
+    margin: 18px 0;
+    font-size: 1.25em; /* <<-- AUMENTADO */
     text-align: center;
     overflow-x: auto;
-    color: var(--cor-texto-principal); /* Marrom bem escuro */
+    color: var(--cor-texto-principal);
+    line-height: 1.5; /* Ajuste para fontes maiores */
 }
+
+/* Classe para fórmulas inline (usada em relatorio_detalhado.html) */
+.formula-inline {
+    font-family: 'Courier New', Courier, monospace; /* Pode remover se quiser usar a fonte padrão */
+    color: #333;
+    margin-left: 8px; /* Pequeno ajuste */
+    font-size: 1.15em;  /* <<-- AUMENTADO */
+    background-color: #f8f8f8;
+    padding: 3px 7px; /* Pequeno ajuste */
+    border: 1px dashed #ddd;
+    border-radius: 3px;
+    vertical-align: middle; /* Tentar alinhar melhor */
+    display: inline-block; /* Garante bom comportamento */
+}
+/* --- FIM AJUSTES FÓRMULAS --- */
+
 .calculo-detalhe .passo-calculo {
     margin: 6px 0;
     padding-bottom: 6px;
@@ -405,19 +421,28 @@ input:focus, select:focus {
     font-weight: bold;
     margin-top: 20px;
     padding-top: 15px;
-    border-top: 1px dashed var(--cor-borda-input); /* Borda bege médio tracejada */
+    border-top: 1px dashed var(--cor-borda-input);
     text-align: center;
     font-size: 1.1em;
 }
-.resultado-check .atende, .resultado-check .nao-atende {
+/* Ajuste para status no rodapé do detalhe */
+.calculo-detalhe .resultado-check .atende,
+.calculo-detalhe .resultado-check .nao-atende,
+.calculo-detalhe .resultado-check .dispensado-status,
+.calculo-detalhe .resultado-check .erro-status {
     font-size: 1em;
+    padding: 4px 12px;
 }
+.calculo-detalhe .resultado-check .status-text {
+     margin-right: 8px;
+}
+
 
 .nota-excentricidade {
     background-color: #fff9e6;
     border: 1px solid #ffecb3;
     border-left-width: 5px;
-    border-left-color: #ffc107; /* Amarelo mantido para destaque */
+    border-left-color: #ffc107;
     padding: 12px 18px;
     border-radius: var(--border-radius-padrao);
     margin: 15px 0;
@@ -438,6 +463,17 @@ input:focus, select:focus {
     .resultado-label, .passo-calculo .label { min-width: 240px; }
     .form-grid { gap: 20px; }
     .checkbox-grid { gap: 10px; padding: 15px;}
+
+    /* Ajustes responsivos para fórmulas */
+    .latex-formula, .formula-generica {
+        font-size: 1.15em; /* Reduz um pouco em telas menores */
+    }
+    .formula-inline {
+        font-size: 1.1em; /* Reduz um pouco em telas menores */
+        margin-left: 0;
+        display: inline-block;
+        margin-top: 4px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -454,7 +490,8 @@ input:focus, select:focus {
     .botao { padding: 10px 18px; font-size: 1em; width: calc(100% - 20px); margin: 8px auto;} /* Botões empilhados */
     .form-grid { grid-template-columns: 1fr; gap: 18px;} /* Coluna única no form */
     .checkbox-grid { grid-template-columns: 1fr; gap: 8px; padding: 15px;}
-    .latex-formula { font-size: 1em; text-align: left;}
+    .latex-formula, .formula-generica { font-size: 1.1em; text-align: left;} /* Reduz mais e alinha esquerda */
+    .formula-inline { font-size: 1.05em; } /* Reduz mais */
     .calculo-detalhe { padding: 15px; }
     .calculo-detalhe h4 { font-size: 1.1em; }
 }
