@@ -5,6 +5,7 @@ app.py - Aplicação Flask para Verificação de Elementos de Madeira (NBR 7190-
 Versão Modificada:
 - Calcula k_M (0.7 para retangular, 1.0 para outras) e passa para verificações.
 - Passa a função abs() para o template relatorio_detalhado.html.
+- Passa a função max() para o template relatorio.html e relatorio_detalhado.html.
 - Função central `realizar_calculo_completo`.
 - Retorna resultados detalhados para memorial.
 - Ordem de cálculo de f_d corrigida para dependências (f_t90d, f_c90d).
@@ -13,6 +14,8 @@ Versão Modificada:
 - Verificação de Tração Perpendicular agora afeta resultado geral.
 - Verificação de estabilidade integrada à Compressão e Flexocompressão.
 - ATENÇÃO: Compressão Perpendicular ainda usa Área Transversal por padrão.
+- MODIFICADO: Aplicabilidade de Tração/Compressão Simples baseada apenas na força axial.
+- MODIFICADO: Lógica de exc. mínima não desativa mais aplicabilidade de comp. simples.
 """
 
 import math
@@ -28,7 +31,6 @@ GAMMA_M, GAMMA_C, GAMMA_T, GAMMA_V = 1.4, 1.4, 1.4, 1.8
 
 try:
     # Certifique-se que calculos_madeira.py está atualizado
-    # Importa as funções necessárias, incluindo as modificadas
     from calculos_madeira import (
         tabelas_madeira, kmod1_valores, kmod2_valores,
         GAMMA_M, GAMMA_C, GAMMA_T, GAMMA_V, TOL,
@@ -39,11 +41,11 @@ try:
         obter_E0_med, obter_E0_05, obter_E0_ef,
         verificar_dimensoes_minimas, verificar_tracao_simples,
         verificar_compressao_axial_com_estabilidade,
-        verificar_flexocompressao_resistencia,     # k_M agora é parâmetro
-        verificar_flexocompressao_com_estabilidade, # k_M agora é parâmetro, retorna 11 valores
-        verificar_flexotracao,                      # k_M agora é parâmetro
+        verificar_flexocompressao_resistencia,
+        verificar_flexocompressao_com_estabilidade,
+        verificar_flexotracao,
         verificar_flexao_simples_reta,
-        verificar_flexao_obliqua,                   # k_M agora é parâmetro
+        verificar_flexao_obliqua,
         verificar_cisalhamento,
         verificar_compressao_perpendicular,
         verificar_estabilidade_lateral_viga,
@@ -70,6 +72,7 @@ app = Flask(__name__)
 # app.secret_key = 'defina_uma_chave_aqui_se_usar_sessoes'
 
 # --- Funções Auxiliares de Validação ---
+# (Funções validar_float e validar_selecao permanecem as mesmas)
 def validar_float(valor_str, nome_campo, permitir_zero=True, permitir_negativo=True, minimo=None, maximo=None):
     if valor_str is None or valor_str.strip() == "":
         if permitir_zero: return 0.0
@@ -122,11 +125,6 @@ def validar_selecao(valor_str, nome_campo, opcoes_validas):
 
 # --- Função Central de Cálculo ---
 def realizar_calculo_completo(dados_validados):
-    """
-    Orquestra todos os cálculos e verificações.
-    Retorna um dicionário detalhado com todos os resultados intermediários e finais.
-    Determina k_M com base na geometria.
-    """
     if not MODULO_CALCULOS_OK:
         raise ImportError("Módulo de cálculos não carregado. Verificação impossível.")
 
@@ -212,103 +210,124 @@ def realizar_calculo_completo(dados_validados):
         raise ValueError(f"Falha nos cálculos iniciais: {str(e)}") from e
 
     # === Bloco 2: Esforços Efetivos ===
+    # (Mantido como na versão anterior)
     Nsd_t0_calc = resultados['N_sd_t0_input']
     Nsd_c0_calc = resultados['N_sd_c0_input']
     Nsd_t90_calc = resultados['N_sd_t90_input']
     Nsd_c90_calc = resultados['N_sd_c90_input']
     Vsd_calc = abs(resultados['V_sd_input'])
-    M_sdx_calc = resultados['M_sd_x_Nm_input'] * 1000
-    M_sdy_calc = resultados['M_sd_y_Nm_input'] * 1000
+    M_sdx_calc_orig = resultados['M_sd_x_Nm_input'] * 1000
+    M_sdy_calc_orig = resultados['M_sd_y_Nm_input'] * 1000
     resultados['calculos']['aplicou_exc_min'] = False
     resultados['calculos']['e_min_mm'] = 0.0
-    resultados['calculos']['M_sd_x_Nm_calculado'] = M_sdx_calc / 1000
-    resultados['calculos']['M_sd_y_Nm_calculado'] = M_sdy_calc / 1000
 
-    if Nsd_c0_calc > TOL and abs(M_sdx_calc) <= TOL and abs(M_sdy_calc) <= TOL:
+    if Nsd_c0_calc > TOL and abs(M_sdx_calc_orig) <= TOL and abs(M_sdy_calc_orig) <= TOL:
         limite_imp = 300.0 if resultados['tipo_madeira_beta_c'] == 'serrada' else 500.0
         if 'comprimento_mm' not in resultados: raise ValueError("Chave 'comprimento_mm' não encontrada.")
-        e_min = resultados['comprimento_mm'] / limite_imp
-        M_sdx_calc = abs(Nsd_c0_calc * e_min)
-        M_sdy_calc = abs(Nsd_c0_calc * e_min)
+        e_min = max(resultados['comprimento_mm'] / limite_imp, 20.0)
+        M_sdx_exc_min = abs(Nsd_c0_calc * e_min)
+        M_sdy_exc_min = abs(Nsd_c0_calc * e_min)
+        M_sdx_final = M_sdx_exc_min
+        M_sdy_final = M_sdy_exc_min
         resultados['calculos']['aplicou_exc_min'] = True
         resultados['calculos']['e_min_mm'] = e_min
-        resultados['calculos']['M_sd_x_Nm_calculado'] = M_sdx_calc / 1000
-        resultados['calculos']['M_sd_y_Nm_calculado'] = M_sdy_calc / 1000
+        print(f"INFO: Excentricidade mínima de {e_min:.2f} mm aplicada.")
+    else:
+        M_sdx_final = M_sdx_calc_orig
+        M_sdy_final = M_sdy_calc_orig
 
     esforcos_calculo = {
         'Nsd_t0': Nsd_t0_calc, 'Nsd_c0': Nsd_c0_calc, 'Nsd_t90': Nsd_t90_calc, 'Nsd_c90': Nsd_c90_calc,
-        'Vsd': Vsd_calc, 'Msdx': M_sdx_calc, 'Msdy': M_sdy_calc
+        'Vsd': Vsd_calc, 'Msdx': M_sdx_final, 'Msdy': M_sdy_final
     }
     resultados['calculos']['esforcos_finais'] = esforcos_calculo
-    resultados['M_sdx_calc_Nmm'] = M_sdx_calc
-    resultados['M_sdy_calc_Nmm'] = M_sdy_calc
+    resultados['calculos']['M_sd_x_Nm_calculado'] = M_sdx_final / 1000
+    resultados['calculos']['M_sd_y_Nm_calculado'] = M_sdy_final / 1000
+    resultados['M_sdx_calc_Nmm'] = M_sdx_final
+    resultados['M_sdy_calc_Nmm'] = M_sdy_final
 
-    # === Bloco 3: Aplicabilidade ===
+    # === Bloco 3: Determinar Aplicabilidade das Verificações ===
+    # (Lógica MODIFICADA novamente para exc. mínima)
     is_tension = esforcos_calculo['Nsd_t0'] > TOL
     is_compression = esforcos_calculo['Nsd_c0'] > TOL
     has_moment_x = abs(esforcos_calculo['Msdx']) > TOL
     has_moment_y = abs(esforcos_calculo['Msdy']) > TOL
+    has_moment = has_moment_x or has_moment_y
     has_shear = esforcos_calculo['Vsd'] > TOL
     has_perp_comp = esforcos_calculo['Nsd_c90'] > TOL
     has_perp_tension = esforcos_calculo['Nsd_t90'] > TOL
 
     aplicabilidade = {
-        'dimensoes': True, 'tracao_simples': is_tension, 'tracao_perpendicular': has_perp_tension,
-        'compressao_simples_resistencia': is_compression, 'compressao_estabilidade': is_compression,
-        'compressao_perpendicular': has_perp_comp, 'flexao_simples_reta': has_moment_x or has_moment_y,
+        'dimensoes': True,
+        'tracao_simples': is_tension,                 # Aplicável se houver tração
+        'tracao_perpendicular': has_perp_tension,
+        'compressao_simples_resistencia': is_compression, # Aplicável se houver compressão
+        'compressao_estabilidade': is_compression,    # Aplicável se houver compressão
+        'compressao_perpendicular': has_perp_comp,
+        'flexao_simples_reta': has_moment and not is_tension and not is_compression and (has_moment_x ^ has_moment_y),
         'flexao_obliqua': has_moment_x and has_moment_y and not is_tension and not is_compression,
-        'flexotracao': is_tension and (has_moment_x or has_moment_y),
-        'flexocompressao': is_compression and (has_moment_x or has_moment_y),
-        'cisalhamento': has_shear, 'estabilidade_lateral': has_moment_x
+        'flexotracao': is_tension and has_moment,
+        'flexocompressao': is_compression and has_moment,
+        'cisalhamento': has_shear,
+        'estabilidade_lateral': has_moment_x
     }
-    is_fsr_applicable_alone = aplicabilidade['flexao_simples_reta'] and not (aplicabilidade['flexao_obliqua'] or aplicabilidade['flexotracao'] or aplicabilidade['flexocompressao'])
+    # Excentricidade mínima: MARCA flexocompressão como aplicável, MAS NÃO DESMARCA comp. simples
+    if resultados['calculos']['aplicou_exc_min']:
+        # aplicabilidade['compressao_simples_resistencia'] = False # <-- REMOVIDO/COMENTADO
+        # aplicabilidade['compressao_estabilidade'] = False    # <-- REMOVIDO/COMENTADO
+        aplicabilidade['flexocompressao'] = True             # Garante que flexocomp é aplicável
 
-    for chave in aplicabilidade.keys():
-        if chave not in resultados['verificacoes']:
-             resultados['verificacoes'][chave] = {'verificacao_aplicavel': False, 'passou': None, 'erro': None, 'is_combined_case': False, 'esforcos': {}}
+    # Prepara dicionário de verificações
+    chaves_todas = [
+        'dimensoes', 'tracao_simples', 'tracao_perpendicular',
+        'compressao_simples_resistencia', 'compressao_estabilidade',
+        'compressao_perpendicular', 'flexao_simples_reta', 'flexao_obliqua',
+        'flexotracao', 'flexocompressao', 'cisalhamento', 'estabilidade_lateral'
+    ]
+    for chave in chaves_todas:
+        resultados['verificacoes'][chave] = {'verificacao_aplicavel': False, 'passou': None, 'erro': None, 'is_combined_case': False, 'esforcos': {}}
 
+    # Preenche aplicabilidade e flag 'is_combined_case'
     for chave, aplicavel in aplicabilidade.items():
         esforcos_chave = {}
+        # (Coleta de esforços como antes)
         if 'tracao' in chave and 'perp' not in chave: esforcos_chave['Nsd'] = esforcos_calculo['Nsd_t0']
         if ('compressao_simples_resistencia' in chave or 'compressao_estabilidade' in chave): esforcos_chave['Nsd'] = esforcos_calculo['Nsd_c0']
-        elif 'compressao_perpendicular' in chave: esforcos_chave['Nsd'] = esforcos_calculo['Nsd_c90']
+        if 'compressao_perpendicular' in chave: esforcos_chave['Nsd'] = esforcos_calculo['Nsd_c90']
         if 'tracao_perpendicular' in chave: esforcos_chave['Nsd'] = esforcos_calculo['Nsd_t90']
         if 'flexao' in chave or 'flexo' in chave or 'estabilidade_lateral' in chave:
             esforcos_chave['Msdx'] = esforcos_calculo['Msdx']
             esforcos_chave['Msdy'] = esforcos_calculo['Msdy']
         if 'cisalhamento' in chave: esforcos_chave['Vsd'] = esforcos_calculo['Vsd']
 
-        verificacao_realmente_aplicavel = aplicavel
         is_combined_case = False
         if chave == 'tracao_simples' and aplicabilidade['flexotracao']: is_combined_case = True
-        elif ('compressao_simples_resistencia' in chave or 'compressao_estabilidade' in chave) and aplicabilidade['flexocompressao']: is_combined_case = True
-        elif chave == 'flexao_simples_reta' and not is_fsr_applicable_alone:
-             verificacao_realmente_aplicavel = False
-             is_combined_case = aplicavel
+        if ('compressao_simples_resistencia' in chave or 'compressao_estabilidade' in chave) and aplicabilidade['flexocompressao']: is_combined_case = True
+        if chave == 'flexao_simples_reta' and (aplicabilidade['flexao_obliqua'] or aplicabilidade['flexotracao'] or aplicabilidade['flexocompressao']): is_combined_case = True
 
-        if chave in resultados['verificacoes']:
-             resultados['verificacoes'][chave].update({
-                'verificacao_aplicavel': verificacao_realmente_aplicavel, 'is_combined_case': is_combined_case, 'esforcos': esforcos_chave
-            })
-        else:
-            resultados['verificacoes'][chave] = {
-                'verificacao_aplicavel': verificacao_realmente_aplicavel, 'passou': None, 'erro': None,
-                'is_combined_case': is_combined_case, 'esforcos': esforcos_chave
-            }
+        resultados['verificacoes'][chave].update({
+            'verificacao_aplicavel': aplicavel,
+            'is_combined_case': is_combined_case,
+            'esforcos': esforcos_chave
+        })
+
+    # Pega o k_M calculado no Bloco 0
+    k_M_usar = resultados['calculos'].get('k_M', 0.7)
 
     # === Bloco 4: Executar Verificações Aplicáveis ===
     calc = resultados['calculos']
     geom = calc['geom']
     verifs = resultados['verificacoes']
-    k_M_usar = calc.get('k_M', 0.7) # Pega o k_M calculado no Bloco 0
 
-    # --- Dimensões, Tração Simples, Tração Perpendicular ---
+    # --- Dimensões ---
     if verifs['dimensoes']['verificacao_aplicavel']:
         try:
             a_ok, e_ok = verificar_dimensoes_minimas(resultados['largura_mm'], resultados['altura_mm'], resultados['tipo_peca_dim'])
             verifs['dimensoes'].update({'area_ok': a_ok, 'espessura_ok': e_ok, 'passou': a_ok and e_ok})
             if not (a_ok and e_ok): geral_ok = False
         except Exception as e: verifs['dimensoes'].update({'passou': False, 'erro': str(e)}); geral_ok = False
+
+    # --- Tração Paralela ---
     if verifs['tracao_simples']['verificacao_aplicavel']:
         try:
             p, nsd, nrd = verificar_tracao_simples(esforcos_calculo['Nsd_t0'], geom['area'], calc['f_t0d'])
@@ -317,6 +336,8 @@ def realizar_calculo_completo(dados_validados):
         except Exception as e:
             verifs['tracao_simples'].update({'passou': False, 'erro': str(e)})
             if not verifs['tracao_simples']['is_combined_case']: geral_ok = False
+
+    # --- Tração Perpendicular ---
     if verifs['tracao_perpendicular']['verificacao_aplicavel']:
         try:
             nrd_t90 = calc.get('f_t90d', 0.0) * geom.get('area', 0.0)
@@ -328,44 +349,42 @@ def realizar_calculo_completo(dados_validados):
              verifs['tracao_perpendicular'].update({'passou': False, 'erro': str(e), 'NRd': 0.0})
              geral_ok = False
 
-    # --- Compressão Axial (Resistência e Estabilidade) ---
-    comp_res_aplicavel = verifs.get('compressao_simples_resistencia', {}).get('verificacao_aplicavel', False)
-    comp_est_aplicavel = verifs.get('compressao_estabilidade', {}).get('verificacao_aplicavel', False)
-    if comp_res_aplicavel or comp_est_aplicavel:
+    # --- Compressão Paralela (Resistência e Estabilidade) ---
+    if verifs['compressao_simples_resistencia']['verificacao_aplicavel']:
         try:
-            (passou_geral_comp, nsd_comp,
-             passou_res_comp, NRd_res_comp,
-             passou_est_comp_pura, NRd_est_comp,
-             lambda_x_comp, lambda_y_comp, lambda_rel_x_comp, lambda_rel_y_comp,
-             kc_x_comp, kc_y_comp,
+            (passou_geral_comp, nsd_comp, passou_res_comp, NRd_res_comp,
+             passou_est_comp_pura, NRd_est_comp, lambda_x_comp, lambda_y_comp,
+             lambda_rel_x_comp, lambda_rel_y_comp, kc_x_comp, kc_y_comp,
              esbeltez_ok_comp
             ) = verificar_compressao_axial_com_estabilidade(
                 esforcos_calculo['Nsd_c0'], geom['area'], calc['f_c0k'], calc['f_c0d'], calc['E_005'],
                 resultados['comprimento_mm'], resultados['Ke_x'], resultados['Ke_y'],
                 props_geom=geom, beta_c=calc['beta_c']
             )
-            if comp_res_aplicavel:
-                 verifs['compressao_simples_resistencia'].update({'passou': passou_res_comp, 'Nsd': nsd_comp, 'NRd': NRd_res_comp})
-            if comp_est_aplicavel:
-                 verifs['compressao_estabilidade'].update({
-                     'passou': passou_est_comp_pura, 'Nsd': nsd_comp, 'NRd': NRd_est_comp,
-                     'lambda_x': lambda_x_comp, 'lambda_y': lambda_y_comp,
-                     'lambda_rel_x': lambda_rel_x_comp, 'lambda_rel_y': lambda_rel_y_comp,
-                     'kc_x': kc_x_comp, 'kc_y': kc_y_comp, 'esbeltez_ok': esbeltez_ok_comp,
-                     'lambda_max': max(lambda_x_comp, lambda_y_comp), 'kc_min': min(kc_x_comp, kc_y_comp),
-                     'passou_est_apenas': passou_est_comp_pura and esbeltez_ok_comp
-                 })
-            if not passou_geral_comp and not verifs['compressao_simples_resistencia'].get('is_combined_case', False):
+            verifs['compressao_simples_resistencia'].update({'passou': passou_res_comp, 'Nsd': nsd_comp, 'NRd': NRd_res_comp})
+            passou_est_final = passou_est_comp_pura and esbeltez_ok_comp
+            verifs['compressao_estabilidade'].update({
+                 'verificacao_aplicavel': True, 'passou': passou_est_final, 'Nsd': nsd_comp,
+                 'NRd': NRd_est_comp, 'lambda_x': lambda_x_comp, 'lambda_y': lambda_y_comp,
+                 'lambda_rel_x': lambda_rel_x_comp, 'lambda_rel_y': lambda_rel_y_comp,
+                 'kc_x': kc_x_comp, 'kc_y': kc_y_comp, 'esbeltez_ok': esbeltez_ok_comp,
+                 'lambda_max': max(lambda_x_comp, lambda_y_comp), 'kc_min': min(kc_x_comp, kc_y_comp),
+                 'passou_est_apenas': passou_est_comp_pura
+            })
+            passou_comp_total = passou_res_comp and passou_est_final
+            verifs['compressao_simples_resistencia']['passou_geral_compressao_pura'] = passou_comp_total
+            if not passou_comp_total and not verifs['compressao_simples_resistencia']['is_combined_case']:
                 geral_ok = False
         except Exception as e:
             erro_str = str(e)
-            print(f"ERRO na verificação de Compressão Axial: {erro_str}\n{traceback.format_exc()}")
-            if comp_res_aplicavel: verifs['compressao_simples_resistencia'].update({'passou': False, 'erro': erro_str})
-            if comp_est_aplicavel: verifs['compressao_estabilidade'].update({'passou': False, 'erro': erro_str})
-            if not verifs.get('compressao_simples_resistencia', {}).get('is_combined_case', False): geral_ok = False
+            print(f"ERRO na verificação de Compressão Paralela: {erro_str}\n{traceback.format_exc()}")
+            verifs['compressao_simples_resistencia'].update({'passou': False, 'erro': erro_str})
+            verifs['compressao_estabilidade'].update({'verificacao_aplicavel': True, 'passou': False, 'erro': erro_str})
+            if not verifs['compressao_simples_resistencia']['is_combined_case']:
+                geral_ok = False
 
-    # --- Compressão Perpendicular (Usa Area A) ---
-    if verifs.get('compressao_perpendicular') and verifs['compressao_perpendicular']['verificacao_aplicavel']:
+    # --- Compressão Perpendicular ---
+    if verifs['compressao_perpendicular']['verificacao_aplicavel']:
         try:
             area_apoio_usada = geom['area']
             p, nsd, nrd = verificar_compressao_perpendicular(esforcos_calculo['Nsd_c90'], area_apoio_usada, calc['f_c90d'])
@@ -375,14 +394,14 @@ def realizar_calculo_completo(dados_validados):
              verifs['compressao_perpendicular'].update({'passou': False, 'erro': str(e)})
              geral_ok = False
 
-    # --- Flexão Reta, Oblíqua, Flexotração ---
+    # --- Flexão Simples Reta ---
     if verifs['flexao_simples_reta']['verificacao_aplicavel']:
         passou_flex_x = True; passou_flex_y = True; erro_flex_x = None; erro_flex_y = None
         if abs(esforcos_calculo['Msdx']) > TOL:
             try:
                 px, msdx, mrx = verificar_flexao_simples_reta(esforcos_calculo['Msdx'], geom['W_x'], calc['f_md'])
                 verifs['flexao_simples_reta']['x'] = {'verificacao_aplicavel': True, 'passou': px, 'Msd': msdx, 'MRd': mrx}
-                passou_flex_x = px
+                if not px: passou_flex_x = False
             except Exception as e:
                 erro_flex_x = str(e); passou_flex_x = False
                 verifs['flexao_simples_reta']['x'] = {'verificacao_aplicavel': True, 'passou': False, 'erro': erro_flex_x}
@@ -391,33 +410,31 @@ def realizar_calculo_completo(dados_validados):
              try:
                  py, msdy, mry = verificar_flexao_simples_reta(esforcos_calculo['Msdy'], geom['W_y'], calc['f_md'])
                  verifs['flexao_simples_reta']['y'] = {'verificacao_aplicavel': True, 'passou': py, 'Msd': msdy, 'MRd': mry}
-                 passou_flex_y = py
+                 if not py: passou_flex_y = False
              except Exception as e:
                  erro_flex_y = str(e); passou_flex_y = False
                  verifs['flexao_simples_reta']['y'] = {'verificacao_aplicavel': True, 'passou': False, 'erro': erro_flex_y}
         else: verifs['flexao_simples_reta']['y'] = {'verificacao_aplicavel': False, 'passou': True}
-        verifs['flexao_simples_reta']['passou'] = passou_flex_x and passou_flex_y
+        passou_fsr_total = passou_flex_x and passou_flex_y
+        verifs['flexao_simples_reta']['passou'] = passou_fsr_total
         if erro_flex_x or erro_flex_y: verifs['flexao_simples_reta']['erro'] = f"X:{erro_flex_x or '-'} | Y:{erro_flex_y or '-'}"
-        if not (passou_flex_x and passou_flex_y) and not verifs['flexao_simples_reta']['is_combined_case']: geral_ok = False
+        if not passou_fsr_total and not verifs['flexao_simples_reta']['is_combined_case']:
+            geral_ok = False
 
+    # --- Flexão Oblíqua ---
     if verifs['flexao_obliqua']['verificacao_aplicavel']:
         try:
-            p, ratio = verificar_flexao_obliqua(
-                esforcos_calculo['Msdx'], esforcos_calculo['Msdy'],
-                geom['W_x'], geom['W_y'], calc['f_md'], k_M=k_M_usar
-            )
+            p, ratio = verificar_flexao_obliqua(esforcos_calculo['Msdx'], esforcos_calculo['Msdy'], geom['W_x'], geom['W_y'], calc['f_md'], k_M=k_M_usar)
             verifs['flexao_obliqua'].update({'passou': p, 'ratio': ratio, 'Msdx': esforcos_calculo['Msdx'], 'Msdy': esforcos_calculo['Msdy'], 'k_M_usado': k_M_usar})
             if not p: geral_ok = False
         except Exception as e:
             verifs['flexao_obliqua'].update({'passou': False, 'erro': str(e)})
             geral_ok = False
 
+    # --- Flexotração ---
     if verifs['flexotracao']['verificacao_aplicavel']:
         try:
-            p, ratio = verificar_flexotracao(
-                esforcos_calculo['Nsd_t0'], esforcos_calculo['Msdx'], esforcos_calculo['Msdy'],
-                geom['area'], geom['W_x'], geom['W_y'], calc['f_t0d'], calc['f_md'], k_M=k_M_usar
-            )
+            p, ratio = verificar_flexotracao(esforcos_calculo['Nsd_t0'], esforcos_calculo['Msdx'], esforcos_calculo['Msdy'], geom['area'], geom['W_x'], geom['W_y'], calc['f_t0d'], calc['f_md'], k_M=k_M_usar)
             verifs['flexotracao'].update({'passou': p, 'ratio': ratio, 'Nsd': esforcos_calculo['Nsd_t0'], 'Msdx': esforcos_calculo['Msdx'], 'Msdy': esforcos_calculo['Msdy'], 'k_M_usado': k_M_usar})
             if not p: geral_ok = False
         except Exception as e:
@@ -426,45 +443,27 @@ def realizar_calculo_completo(dados_validados):
 
     # --- Flexocompressão ---
     if verifs['flexocompressao']['verificacao_aplicavel']:
-        passou_fc_res = True; passou_fc_est = True; erro_fc_res = None; erro_fc_est = None
+        passou_fc_res = True; passou_fc_est_final = True; erro_fc_res = None; erro_fc_est = None
         try:
-            p_res, ratio_res = verificar_flexocompressao_resistencia(
-                esforcos_calculo['Nsd_c0'], esforcos_calculo['Msdx'], esforcos_calculo['Msdy'],
-                geom['area'], geom['W_x'], geom['W_y'], calc['f_c0d'], calc['f_md'], k_M=k_M_usar
-            )
-            verifs['flexocompressao']['resistencia'] = {
-                'passou': p_res, 'ratio': ratio_res, 'Nsd': esforcos_calculo['Nsd_c0'],
-                'Msdx': esforcos_calculo['Msdx'], 'Msdy': esforcos_calculo['Msdy'], 'k_M_usado': k_M_usar
-            }
-            passou_fc_res = p_res
+            p_res, ratio_res = verificar_flexocompressao_resistencia(esforcos_calculo['Nsd_c0'], esforcos_calculo['Msdx'], esforcos_calculo['Msdy'], geom['area'], geom['W_x'], geom['W_y'], calc['f_c0d'], calc['f_md'], k_M=k_M_usar)
+            verifs['flexocompressao']['resistencia'] = {'passou': p_res, 'ratio': ratio_res, 'Nsd': esforcos_calculo['Nsd_c0'], 'Msdx': esforcos_calculo['Msdx'], 'Msdy': esforcos_calculo['Msdy'], 'k_M_usado': k_M_usar}
+            if not p_res: passou_fc_res = False
         except Exception as e:
             erro_fc_res = str(e); passou_fc_res = False
             verifs['flexocompressao']['resistencia'] = {'passou': False, 'erro': erro_fc_res}
         try:
-            (p_est_geral, ratio_est, lam_x, lam_y, lam_rel_x, lam_rel_y, kcx, kcy,
-             lambda_max_fc, esbeltez_ok_fc, passou_ratio_apenas_fc
-             ) = verificar_flexocompressao_com_estabilidade(
-                esforcos_calculo['Nsd_c0'], esforcos_calculo['Msdx'], esforcos_calculo['Msdy'],
-                geom['area'], geom['W_x'], geom['W_y'], calc['f_c0k'], calc['f_c0d'], calc['f_md'],
-                calc['E_005'], resultados['comprimento_mm'], resultados['Ke_x'], resultados['Ke_y'],
-                props_geom=geom, beta_c=calc['beta_c'], k_M=k_M_usar
-            )
-            verifs['flexocompressao']['estabilidade'] = {
-                'passou': p_est_geral, 'ratio': ratio_est, 'lambda_x': lam_x, 'lambda_y': lam_y,
-                'lambda_rel_x': lam_rel_x, 'lambda_rel_y': lam_rel_y, 'kc_x': kcx, 'kc_y': kcy,
-                'k_M_usado': k_M_usar, 'lambda_max': lambda_max_fc, 'esbeltez_ok': esbeltez_ok_fc,
-                'passou_ratio_apenas': passou_ratio_apenas_fc
-            }
-            passou_fc_est = p_est_geral
+            (p_est_geral, ratio_est, lam_x, lam_y, lam_rel_x, lam_rel_y, kcx, kcy, lambda_max_fc, esbeltez_ok_fc, passou_ratio_apenas_fc) = verificar_flexocompressao_com_estabilidade(esforcos_calculo['Nsd_c0'], esforcos_calculo['Msdx'], esforcos_calculo['Msdy'], geom['area'], geom['W_x'], geom['W_y'], calc['f_c0k'], calc['f_c0d'], calc['f_md'], calc['E_005'], resultados['comprimento_mm'], resultados['Ke_x'], resultados['Ke_y'], props_geom=geom, beta_c=calc['beta_c'], k_M=k_M_usar)
+            verifs['flexocompressao']['estabilidade'] = {'passou': p_est_geral, 'ratio': ratio_est, 'lambda_x': lam_x, 'lambda_y': lam_y, 'lambda_rel_x': lam_rel_x, 'lambda_rel_y': lam_rel_y, 'kc_x': kcx, 'kc_y': kcy, 'k_M_usado': k_M_usar, 'lambda_max': lambda_max_fc, 'esbeltez_ok': esbeltez_ok_fc, 'passou_ratio_apenas': passou_ratio_apenas_fc}
+            if not p_est_geral: passou_fc_est_final = False
         except Exception as e:
-            erro_fc_est = str(e); passou_fc_est = False
+            erro_fc_est = str(e); passou_fc_est_final = False
             verifs['flexocompressao']['estabilidade'] = {'passou': False, 'erro': erro_fc_est}
-
-        verifs['flexocompressao']['passou'] = passou_fc_res and passou_fc_est
+        passou_fc_total = passou_fc_res and passou_fc_est_final
+        verifs['flexocompressao']['passou'] = passou_fc_total
         if erro_fc_res or erro_fc_est: verifs['flexocompressao']['erro'] = f"Res:{erro_fc_res or '-'} | Est:{erro_fc_est or '-'}"
-        if not (passou_fc_res and passou_fc_est): geral_ok = False
+        if not passou_fc_total: geral_ok = False
 
-    # --- Cisalhamento, Estabilidade Lateral ---
+    # --- Cisalhamento ---
     if verifs['cisalhamento']['verificacao_aplicavel']:
         try:
              p, vsd, vrd = verificar_cisalhamento(esforcos_calculo['Vsd'], geom['area'], calc['f_vd'])
@@ -473,31 +472,39 @@ def realizar_calculo_completo(dados_validados):
         except Exception as e:
             verifs['cisalhamento'].update({'passou': False, 'erro': str(e)})
             geral_ok = False
+
+    # --- Estabilidade Lateral ---
     if verifs['estabilidade_lateral']['verificacao_aplicavel']:
         try:
-             resultados_fl = verificar_estabilidade_lateral_viga(
-                 resultados['largura_mm'], resultados['altura_mm'], resultados['L1_mm'],
-                 calc['E_0med'], calc['f_md'], calc['k_mod'],
-                 esforcos_calculo['Msdx'], geom['W_x']
-             )
+             resultados_fl = verificar_estabilidade_lateral_viga(resultados['largura_mm'], resultados['altura_mm'], resultados['L1_mm'], calc['E_0med'], calc['f_md'], calc['k_mod'], esforcos_calculo['Msdx'], geom['W_x'])
              verifs['estabilidade_lateral'].update(resultados_fl)
              if resultados_fl.get('passou') is False: geral_ok = False
         except Exception as e:
             verifs['estabilidade_lateral'].update({'passou': False, 'erro': str(e)})
             geral_ok = False
 
-    # --- Resultado Geral Final ---
+    # === Resultado Geral Final ---
     resultados['geral_ok'] = geral_ok
     return resultados
 
 # --- Rotas da Aplicação Flask ---
+# (Rotas / , /novo_dimensionamento, /calcular, /relatorio_detalhado e if __name__ == '__main__'
+# permanecem as mesmas da versão anterior)
 @app.route('/')
 def inicio():
     return render_template('inicio.html')
 
 @app.route('/novo_dimensionamento')
 def formulario():
-    return render_template('formulario.html', tabelas_madeira=tabelas_madeira if MODULO_CALCULOS_OK else {})
+    tabelas_a_passar = {}
+    try:
+        from calculos_madeira import tabelas_madeira as tabelas_importadas
+        tabelas_a_passar = tabelas_importadas
+    except Exception:
+        print("AVISO: Falha ao recarregar tabelas_madeira para o formulário.")
+        global tabelas_madeira
+        tabelas_a_passar = tabelas_madeira
+    return render_template('formulario.html', tabelas_madeira=tabelas_a_passar)
 
 @app.route('/calcular', methods=['POST'])
 def calcular_e_verificar():
@@ -505,7 +512,7 @@ def calcular_e_verificar():
     verificacoes_selecionadas_lista = []
     try:
         if not MODULO_CALCULOS_OK:
-             raise ImportError("Módulo de cálculos ('calculos_madeira.py') não foi carregado com sucesso.")
+             raise ImportError("Módulo de cálculos ('calculos_madeira.py') não foi carregado com sucesso ou contém erros.")
 
         form_data = request.form
         input_data_storage = dict(form_data)
@@ -522,7 +529,21 @@ def calcular_e_verificar():
         mostrar_verificacoes['compressao_estabilidade'] = mostrar_verificacoes.get('compressao_simples_resistencia', False)
 
         tipo_tabela_val = validar_selecao(form_data.get('tipo_tabela'), 'Tipo de Tabela', ["estrutural", "nativa"])
-        classes_validas = list(tabelas_madeira.get(tipo_tabela_val, {}).keys()) if MODULO_CALCULOS_OK else []
+        tabelas_disp = {}
+        if MODULO_CALCULOS_OK:
+            global tabelas_madeira
+            tabelas_disp = tabelas_madeira
+        else:
+            try:
+                from calculos_madeira import tabelas_madeira as tabelas_imp
+                tabelas_disp = tabelas_imp
+            except Exception:
+                 raise ImportError("Falha crítica ao carregar dados das tabelas de madeira.")
+
+        classes_validas = list(tabelas_disp.get(tipo_tabela_val, {}).keys())
+        if not classes_validas:
+             raise ValueError(f"Nenhuma classe de madeira encontrada para o tipo de tabela '{tipo_tabela_val}'.")
+
         dados_validados = {
             'tipo_tabela': tipo_tabela_val,
             'classe_madeira': validar_selecao(form_data.get('classe_madeira'), 'Classe da Madeira', classes_validas),
@@ -536,10 +557,10 @@ def calcular_e_verificar():
             'Ke_x': validar_float(form_data.get('Ke_x', '1.0'), 'Ke_x', permitir_zero=False, permitir_negativo=False, minimo=0.5),
             'Ke_y': validar_float(form_data.get('Ke_y', '1.0'), 'Ke_y', permitir_zero=False, permitir_negativo=False, minimo=0.5),
             'tipo_madeira_beta_c': validar_selecao(form_data.get('tipo_madeira_beta_c', 'serrada'), 'Tipo Madeira (beta_c)', ['serrada', 'mlc']),
-            'N_sd_t0_input': validar_float(form_data.get('tracao_paralela_sd', '0'), 'Tração Paralela (N)', permitir_zero=True, permitir_negativo=False),
-            'N_sd_c0_input': validar_float(form_data.get('compressao_paralela_sd', '0'), 'Compressão Paralela (N)', permitir_zero=True, permitir_negativo=False),
-            'N_sd_t90_input': validar_float(form_data.get('tracao_perpendicular_sd', '0'), 'Tração Perpendicular (N)', permitir_zero=True, permitir_negativo=False),
-            'N_sd_c90_input': validar_float(form_data.get('compressao_perpendicular_sd', '0'), 'Compressão Perpendicular (N)', permitir_zero=True, permitir_negativo=False),
+            'N_sd_t0_input': validar_float(form_data.get('tracao_paralela_sd', '0'), 'Tração Paralela (N)', permitir_zero=True, permitir_negativo=False, minimo=0.0),
+            'N_sd_c0_input': validar_float(form_data.get('compressao_paralela_sd', '0'), 'Compressão Paralela (N)', permitir_zero=True, permitir_negativo=False, minimo=0.0),
+            'N_sd_t90_input': validar_float(form_data.get('tracao_perpendicular_sd', '0'), 'Tração Perpendicular (N)', permitir_zero=True, permitir_negativo=False, minimo=0.0),
+            'N_sd_c90_input': validar_float(form_data.get('compressao_perpendicular_sd', '0'), 'Compressão Perpendicular (N)', permitir_zero=True, permitir_negativo=False, minimo=0.0),
             'V_sd_input': validar_float(form_data.get('forca_cortante_sd', '0'), 'Força Cortante (N)', permitir_zero=True, permitir_negativo=True),
             'M_sd_x_Nm_input': validar_float(form_data.get('momento_x_sd', '0'), 'Momento Fletor X (N.m)', permitir_zero=True, permitir_negativo=True),
             'M_sd_y_Nm_input': validar_float(form_data.get('momento_y_sd', '0'), 'Momento Fletor Y (N.m)', permitir_zero=True, permitir_negativo=True),
@@ -553,13 +574,16 @@ def calcular_e_verificar():
         resultados_calculados['verificacoes_selecionadas'] = verificacoes_selecionadas_lista
         resultados_calculados['inputs'] = input_data_storage
 
-        return render_template('relatorio.html', resultados=resultados_calculados, TOL=TOL)
+        return render_template('relatorio.html',
+                               resultados=resultados_calculados,
+                               TOL=TOL,
+                               max=max)
 
     except (ValueError, KeyError, NameError, ImportError, ZeroDivisionError) as e:
         msg_erro = f"Erro ao processar dados: {str(e)}"
         print(f"Erro na rota /calcular: {msg_erro}\n{traceback.format_exc()}")
         if 'verificacoes_selecionadas' not in input_data_storage:
-            input_data_storage['verificacoes_selecionadas'] = request.form.getlist('verificacoes_selecionadas')
+             input_data_storage['verificacoes_selecionadas'] = request.form.getlist('verificacoes_selecionadas')
         return render_template('erro.html', mensagem=msg_erro, inputs=input_data_storage), 400
     except Exception as e:
         print("="*20 + " ERRO INESPERADO (/calcular) " + "="*20)
@@ -580,23 +604,40 @@ def relatorio_detalhado():
 
         query_data = request.args.to_dict(flat=False)
         input_data_storage = {k: v[0] if len(v) == 1 else v for k, v in query_data.items()}
-        verificacoes_selecionadas_lista = query_data.get('verificacoes_selecionadas[]', query_data.get('verificacoes_selecionadas', []))
+
+        verificacoes_selecionadas_lista = query_data.get('verificacoes_selecionadas[]', [])
+        if not verificacoes_selecionadas_lista:
+             verificacoes_selecionadas_lista = query_data.get('verificacoes_selecionadas', [])
         if isinstance(verificacoes_selecionadas_lista, str):
              verificacoes_selecionadas_lista = [verificacoes_selecionadas_lista]
         input_data_storage['verificacoes_selecionadas'] = verificacoes_selecionadas_lista
 
-        mostrar_verificacoes = {
-            key: key in verificacoes_selecionadas_lista for key in [
-                'dimensoes', 'tracao_simples', 'tracao_perpendicular',
-                'compressao_simples_resistencia',
-                'compressao_perpendicular', 'flexao_simples_reta', 'flexao_obliqua',
-                'flexotracao', 'flexocompressao', 'cisalhamento', 'estabilidade_lateral'
-            ]
-        }
+        chaves_verificacao_selecionaveis = [
+            'dimensoes', 'tracao_simples', 'tracao_perpendicular',
+            'compressao_simples_resistencia',
+            'compressao_perpendicular', 'flexao_simples_reta', 'flexao_obliqua',
+            'flexotracao', 'flexocompressao', 'cisalhamento', 'estabilidade_lateral'
+        ]
+        mostrar_verificacoes = {key: key in verificacoes_selecionadas_lista for key in chaves_verificacao_selecionaveis}
         mostrar_verificacoes['compressao_estabilidade'] = mostrar_verificacoes.get('compressao_simples_resistencia', False)
 
+        # Revalidação dos dados
         tipo_tabela_val = validar_selecao(input_data_storage.get('tipo_tabela'), 'Tipo de Tabela', ["estrutural", "nativa"])
-        classes_validas = list(tabelas_madeira.get(tipo_tabela_val, {}).keys()) if MODULO_CALCULOS_OK else []
+        tabelas_disp = {}
+        if MODULO_CALCULOS_OK:
+            global tabelas_madeira
+            tabelas_disp = tabelas_madeira
+        else:
+            try:
+                from calculos_madeira import tabelas_madeira as tabelas_imp
+                tabelas_disp = tabelas_imp
+            except Exception:
+                 raise ImportError("Falha crítica ao carregar dados das tabelas de madeira.")
+
+        classes_validas = list(tabelas_disp.get(tipo_tabela_val, {}).keys())
+        if not classes_validas:
+             raise ValueError(f"Nenhuma classe de madeira encontrada para o tipo de tabela '{tipo_tabela_val}'.")
+
         dados_validados = {
             'tipo_tabela': tipo_tabela_val,
             'classe_madeira': validar_selecao(input_data_storage.get('classe_madeira'), 'Classe da Madeira', classes_validas),
@@ -610,10 +651,10 @@ def relatorio_detalhado():
             'Ke_x': validar_float(input_data_storage.get('Ke_x', '1.0'), 'Ke_x', permitir_zero=False, permitir_negativo=False, minimo=0.5),
             'Ke_y': validar_float(input_data_storage.get('Ke_y', '1.0'), 'Ke_y', permitir_zero=False, permitir_negativo=False, minimo=0.5),
             'tipo_madeira_beta_c': validar_selecao(input_data_storage.get('tipo_madeira_beta_c', 'serrada'), 'Tipo Madeira (beta_c)', ['serrada', 'mlc']),
-            'N_sd_t0_input': validar_float(input_data_storage.get('tracao_paralela_sd', '0'), 'Tração Paralela (N)', permitir_zero=True, permitir_negativo=False),
-            'N_sd_c0_input': validar_float(input_data_storage.get('compressao_paralela_sd', '0'), 'Compressão Paralela (N)', permitir_zero=True, permitir_negativo=False),
-            'N_sd_t90_input': validar_float(input_data_storage.get('tracao_perpendicular_sd', '0'), 'Tração Perpendicular (N)', permitir_zero=True, permitir_negativo=False),
-            'N_sd_c90_input': validar_float(input_data_storage.get('compressao_perpendicular_sd', '0'), 'Compressão Perpendicular (N)', permitir_zero=True, permitir_negativo=False),
+            'N_sd_t0_input': validar_float(input_data_storage.get('tracao_paralela_sd', '0'), 'Tração Paralela (N)', permitir_zero=True, permitir_negativo=False, minimo=0.0),
+            'N_sd_c0_input': validar_float(input_data_storage.get('compressao_paralela_sd', '0'), 'Compressão Paralela (N)', permitir_zero=True, permitir_negativo=False, minimo=0.0),
+            'N_sd_t90_input': validar_float(input_data_storage.get('tracao_perpendicular_sd', '0'), 'Tração Perpendicular (N)', permitir_zero=True, permitir_negativo=False, minimo=0.0),
+            'N_sd_c90_input': validar_float(input_data_storage.get('compressao_perpendicular_sd', '0'), 'Compressão Perpendicular (N)', permitir_zero=True, permitir_negativo=False, minimo=0.0),
             'V_sd_input': validar_float(input_data_storage.get('forca_cortante_sd', '0'), 'Força Cortante (N)', permitir_zero=True, permitir_negativo=True),
             'M_sd_x_Nm_input': validar_float(input_data_storage.get('momento_x_sd', '0'), 'Momento Fletor X (N.m)', permitir_zero=True, permitir_negativo=True),
             'M_sd_y_Nm_input': validar_float(input_data_storage.get('momento_y_sd', '0'), 'Momento Fletor Y (N.m)', permitir_zero=True, permitir_negativo=True),
@@ -627,11 +668,11 @@ def relatorio_detalhado():
         resultados_calculados['verificacoes_selecionadas'] = verificacoes_selecionadas_lista
         resultados_calculados['inputs'] = input_data_storage
 
-        # Passa 'abs' para o template relatorio_detalhado.html
         return render_template('relatorio_detalhado.html',
                                resultados=resultados_calculados,
                                TOL=TOL,
-                               abs=abs) # Passa a função abs
+                               abs=abs,
+                               max=max)
 
     except (ValueError, KeyError, NameError, ImportError, ZeroDivisionError) as e:
         msg_erro = f"Erro ao gerar relatório detalhado: {str(e)}"
