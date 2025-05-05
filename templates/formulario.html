@@ -146,7 +146,7 @@
                         <label for="tracao_perpendicular_sd">Tração Perpendicular ($N_{sd,t90}$) <span class="unidade">[N]</span>:</label>
                         <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="tracao_perpendicular_sd" name="tracao_perpendicular_sd" required value="0">
                         <span class="error-message" id="tracao_perpendicular_sd-erro"></span>
-                        <small>(Verificação agora impacta resultado)</small> {# Nota atualizada #}
+                        <small>(Verificação agora impacta resultado)</small>
                     </div>
                      <div>
                         <label for="compressao_perpendicular_sd">Compressão Perpendicular ($N_{sd,c90}$) <span class="unidade">[N]</span>:</label>
@@ -216,8 +216,9 @@
                      <div><input type="checkbox" id="chk_dimensoes" name="verificacoes_selecionadas" value="dimensoes" checked><label for="chk_dimensoes">Dimensões Mínimas</label></div>
                      <div><input type="checkbox" id="chk_tracao_paralela" name="verificacoes_selecionadas" value="tracao_simples"><label for="chk_tracao_paralela">Tração Paralela</label></div>
                      <div><input type="checkbox" id="chk_tracao_perpendicular" name="verificacoes_selecionadas" value="tracao_perpendicular"><label for="chk_tracao_perpendicular">Tração Perpendicular</label></div>
-                     <div><input type="checkbox" id="chk_compressao_simples" name="verificacoes_selecionadas" value="compressao_simples_resistencia"><label for="chk_compressao_simples">Compressão Paralela (Resist.)</label></div>
-                     {# Checkbox de estabilidade removido daqui #}
+                     {# --- LABEL ALTERADO AQUI --- #}
+                     <div><input type="checkbox" id="chk_compressao_simples" name="verificacoes_selecionadas" value="compressao_simples_resistencia"><label for="chk_compressao_simples">Compressão Paralela</label></div>
+                     {# --------------------------- #}
                      <div><input type="checkbox" id="chk_compressao_perpendicular" name="verificacoes_selecionadas" value="compressao_perpendicular"><label for="chk_compressao_perpendicular">Compressão Perpendicular</label></div>
                      <div><input type="checkbox" id="chk_flexao_reta" name="verificacoes_selecionadas" value="flexao_simples_reta"><label for="chk_flexao_reta">Flexão Reta</label></div>
                      <div><input type="checkbox" id="chk_flexao_obliqua" name="verificacoes_selecionadas" value="flexao_obliqua"><label for="chk_flexao_obliqua">Flexão Oblíqua</label></div>
@@ -237,7 +238,7 @@
         </form>
     </div>
 
-    {# Script Javascript (mantido como estava para validação e população do select) #}
+    {# Script Javascript (sem alterações, apenas para validação e população do select) #}
     <script>
        // Função de validação principal
         function validarFormulario() {
@@ -272,14 +273,14 @@
                     var permiteZero = true;
                     var permiteNegativo = false;
 
-                    // Definições específicas por campo (igual à versão anterior)
+                    // Definições específicas por campo
                     if (['largura_mm', 'altura_mm', 'comprimento', 'Ke_x', 'Ke_y', 'alpha_n'].includes(campoId)) permiteZero = false;
                     if (['forca_cortante_sd', 'momento_x_sd', 'momento_y_sd'].includes(campoId)) permiteNegativo = true;
                     if (campoId === 'L1_mm') {
                         var momentoXInput = document.getElementById('momento_x_sd');
                         var momentoXValorStr = momentoXInput ? momentoXInput.value.trim().replace(',', '.') : '0';
                         var momentoXValor = parseFloat(momentoXValorStr) || 0;
-                         if (Math.abs(momentoXValor) > 1e-6) permiteZero = false;
+                         if (Math.abs(momentoXValor) > 1e-6) permiteZero = false; // L1 > 0 se Mx != 0
                     }
                     if (['tracao_paralela_sd', 'compressao_paralela_sd', 'tracao_perpendicular_sd', 'compressao_perpendicular_sd'].includes(campoId)) {
                         permiteZero = true; permiteNegativo = false;
@@ -309,7 +310,6 @@
                  erroCheckboxElement.textContent = 'Selecione ao menos uma verificação para incluir no relatório.';
                  formularioValido = false;
                  if (!primeiroErro) {
-                     // Tenta focar no primeiro checkbox do grupo
                      var primeiroCheckbox = document.querySelector('input[name="verificacoes_selecionadas"]');
                      if (primeiroCheckbox) primeiroErro = primeiroCheckbox;
                  }
@@ -325,7 +325,7 @@
             return formularioValido;
         }
 
-        // Função auxiliar para validar e formatar números (igual à versão anterior)
+        // Função auxiliar para validar e formatar números
          function validarEFormatarNumero(input, erroElemento, permitir_zero = true, permitir_negativo = true) {
             var valor = input.value.trim();
             var nomeCampo = input.labels[0] ? input.labels[0].innerText.replace(':', '').trim() : input.id;
@@ -342,18 +342,18 @@
              if (isNaN(valorFloat)) { erroElemento.textContent = `Valor numérico inválido para '${nomeCampo}'.`; return false; }
              if (!permitir_zero && Math.abs(valorFloat) < 1e-9) { erroElemento.textContent = `O campo '${nomeCampo}' não pode ser zero.`; return false; }
              if (!permitir_negativo && valorFloat < -1e-9) { erroElemento.textContent = `O campo '${nomeCampo}' não pode ser negativo.`; return false; }
-             // Validação específica de range (igual à versão anterior)
+             // Validação específica de range
              if(input.id === 'alpha_n' && (valorFloat < 1.0 || valorFloat > 2.0)) { erroElemento.textContent = '$\alpha_n$ deve estar entre 1.0 e 2.0.'; return false; }
              if((input.id === 'Ke_x' || input.id === 'Ke_y') && valorFloat < 0.5) { erroElemento.textContent = '$K_e$ deve ser ≥ 0.5.'; return false; }
              if (input.id === 'L1_mm' && !permitir_zero && valorFloat <= 1e-9) { erroElemento.textContent = '$L_1$ deve ser > 0 quando $M_{sd,x} \ne 0$.'; return false; }
              if (['largura_mm', 'altura_mm', 'comprimento'].includes(input.id) && valorFloat <= 1e-9) { erroElemento.textContent = `O campo '${nomeCampo}' deve ser maior que zero.`; return false; }
 
-            input.value = valorFormatado;
+            input.value = valorFormatado; // Atualiza o campo com o valor formatado
             erroElemento.textContent = '';
             return true;
         }
 
-        // Função auxiliar para validar seleção (igual à versão anterior)
+        // Função auxiliar para validar seleção
         function validarCampoSelect(input, erroElemento) {
             var nomeCampo = input.labels[0] ? input.labels[0].innerText.replace(':', '').trim() : input.id;
             if (input.value === '') { erroElemento.textContent = `O campo '${nomeCampo}' é obrigatório.`; return false; }
@@ -361,20 +361,22 @@
             return true;
         }
 
-        // Adiciona listeners para validação "live" e popula select (igual à versão anterior)
+        // Adiciona listeners para validação "live" e popula select
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('dimensionamento-form');
             if(!form) return;
              var inputsParaValidar = form.querySelectorAll('input[type="text"], select');
              inputsParaValidar.forEach(function(input) {
-                 var eventType = input.tagName === 'SELECT' ? 'change' : 'input';
+                 var eventType = input.tagName === 'SELECT' ? 'change' : 'input'; // 'input' é melhor que 'blur' para feedback imediato
                  input.addEventListener(eventType, function() {
                     var erroElemento = document.getElementById(this.id + '-erro');
-                    if (!erroElemento) return;
+                    if (!erroElemento) return; // Sai se não encontrar elemento de erro
                     if (this.tagName === 'SELECT') {
                          validarCampoSelect(this, erroElemento);
+                         // Atualiza classes de madeira se o tipo de tabela mudar
                          if (this.id === 'tipo_tabela') { popularClassesMadeira(this.value); }
                      } else {
+                         // Revalida número ao digitar/colar
                          var permiteZero = true, permiteNegativo = false;
                          if (['largura_mm', 'altura_mm', 'comprimento', 'Ke_x', 'Ke_y', 'alpha_n'].includes(this.id)) permiteZero = false;
                          if (['forca_cortante_sd', 'momento_x_sd', 'momento_y_sd'].includes(this.id)) permiteNegativo = true;
@@ -386,15 +388,17 @@
                      }
                  });
              });
+             // Popula inicialmente as classes de madeira com base no valor padrão/selecionado
              var tipoTabelaInicial = document.getElementById('tipo_tabela').value;
-             popularClassesMadeira(tipoTabelaInicial || '');
+             popularClassesMadeira(tipoTabelaInicial || ''); // Usa '' se nenhum valor inicial
         });
 
-        // Função para popular o select de Classe da Madeira (igual à versão anterior)
+        // Função para popular o select de Classe da Madeira
          function popularClassesMadeira(tipo) {
              var classeSelect = document.getElementById('classe_madeira');
-             var valorAtual = classeSelect.value;
-             classeSelect.innerHTML = '<option value="">Selecione...</option>';
+             var valorAtual = classeSelect.value; // Salva o valor selecionado anteriormente, se houver
+             classeSelect.innerHTML = '<option value="">Selecione...</option>'; // Limpa opções existentes
+             // Mapeamento de tipos para classes (mantido como estava)
              var classes = {
                 "estrutural": {
                     "Coníferas (Tabela 3)": ['C14', 'C16', 'C18', 'C20', 'C22', 'C24', 'C27', 'C30', 'C35', 'C40', 'C45', 'C50'],
@@ -402,6 +406,7 @@
                 },
                 "nativa": { "Nativas (Tabela 2)": ['D20', 'D30', 'D40', 'D50', 'D60'] }
              };
+             // Adiciona as novas opções baseadas no tipo selecionado
              if (tipo && classes[tipo]) {
                 for (var grupo in classes[tipo]) {
                     var optgroup = document.createElement('optgroup');
@@ -410,8 +415,10 @@
                     classeSelect.appendChild(optgroup);
                 }
              }
+             // Tenta restaurar a seleção anterior se ela ainda for válida
              var valorValido = Array.from(classeSelect.options).some(opt => opt.value === valorAtual);
-             classeSelect.value = valorValido ? valorAtual : "";
+             classeSelect.value = valorValido ? valorAtual : ""; // Restaura ou deixa em "Selecione..."
+             // Revalida o campo select após mudar as opções
              validarCampoSelect(classeSelect, document.getElementById('classe_madeira-erro'));
          }
     </script>
