@@ -5,42 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memorial de Cálculo Detalhado - LignumCalc</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    {# Estilos específicos aprimorados para o memorial #}
-    <style>
-        /* Estilos CSS (mantidos) */
-        body { font-size: 15px; line-height: 1.6; }
-        .container { max-width: 1100px; padding: 25px 35px; }
-        h1 { font-size: 2.1em; margin-bottom: 15px; }
-        h2 { font-size: 1.6em; margin-top: 40px; margin-bottom: 25px; border-bottom: 2px solid var(--cor-primaria); padding-bottom: 10px;}
-        h4 { font-size: 1.25em; color: var(--cor-primaria); margin-bottom: 18px;}
-        h5 { font-size: 1.1em; color: #0056b3; margin-top: 25px; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px dotted #a0855b; }
-        .calculo-detalhe { margin-bottom: 30px; padding: 25px 30px; border: 1px solid #e0e0e0; border-left: 6px solid var(--cor-secundaria); background-color: #fdfdfd; border-radius: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.06); }
-        .calculo-detalhe h4 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 12px; }
-        .formula-generica { display: block; padding: 12px 18px; background-color: #f0f0f0; border: 1px solid #dcdcdc; border-radius: 5px; margin: 20px 0; font-size: 1.1em; text-align: center; overflow-x: auto; color: #333; font-style: italic; }
-        .passo-calculo { margin: 8px 0 12px 0px; line-height: 1.7; padding: 8px 0; border-bottom: 1px dotted #eaeaea; display: flex; flex-wrap: wrap; align-items: baseline; }
-        .passo-calculo:last-child { border-bottom: none; padding-bottom: 0;}
-        .passo-calculo .label { display: inline-block; min-width: 380px; font-weight: 500; color: #555; padding-right: 15px; margin-bottom: 4px; }
-        .passo-calculo .valor { font-family: 'Courier New', Courier, monospace; font-weight: bold; color: #0056b3; background-color: #eaf2f8; padding: 4px 8px; border-radius: 4px; margin-left: 8px; word-break: break-all; border: 1px solid #d0e0f0; }
-        .passo-calculo .formula-inline { font-family: 'Courier New', Courier, monospace; color: #333; margin-left: 10px; font-size: 0.95em; background-color: #f8f8f8; padding: 2px 5px; border: 1px dashed #ddd; border-radius: 3px; }
-        .passo-calculo .unidade { margin-left: 6px; font-size: 0.9em; color: #666; }
-        .resultado-check { font-weight: bold; margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--cor-secundaria); text-align: right; font-size: 1.15em; }
-        .resultado-check .status-text { margin-right: 12px; color: #333; }
-        .resultado-check .atende, .resultado-check .nao-atende, .resultado-check .dispensado-status, .resultado-check .erro-status { font-size: 1.05em; padding: 6px 15px; text-transform: uppercase; font-weight: bold; }
-        .atende { color: #fff; background-color: #28a745; border: 1px solid #28a745; }
-        .nao-atende { color: #fff; background-color: #dc3545; border: 1px solid #dc3545; }
-        .dispensado-status { color: #17a2b8; background-color: #e2f6f8; border: 1px solid #a1dff1; font-weight: bold; }
-        .erro-status { color: var(--cor-erro); background-color: var(--cor-erro-fundo); border: 1px solid #f1b0b7; font-weight: bold; }
-        .calculo-detalhe p:not(.passo-calculo) { border-bottom: none; margin-bottom: 0.5em; }
-        .nota-excentricidade { background-color: #fff3cd; border: 1px solid #ffeeba; border-left-width: 5px; border-left-color: #ffc107; padding: 12px 18px; border-radius: 4px; margin: 20px 0; font-size: 0.95em; color: #856404; }
-        .nota-excentricidade .label { font-weight: bold; min-width: auto; margin-right: 8px; color: inherit;}
-        .nota-excentricidade .valor { font-weight: normal; font-family: inherit; background-color: transparent; padding: 0; color: inherit;}
-        .error-in-verification { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 12px 15px; border-radius: 4px; font-weight: bold; text-align: center; margin: 15px 0; }
-        .not-applicable { font-style: italic; color: #6c757d; text-align: center; padding: 20px 0; font-size: 1.1em; }
-        .warning-info { font-size: 0.9em; color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px 15px; border-radius: 4px; margin: 15px 0; display: block; }
-        @media (max-width: 992px) { .passo-calculo .label { min-width: 300px; } }
-        @media (max-width: 768px) { .passo-calculo { display: block; padding: 10px 0; } .passo-calculo .label { min-width: 100%; display: block; margin-bottom: 5px; padding-right: 0;} .passo-calculo .valor { display: inline-block; margin-left: 0; margin-top: 2px;} .formula-generica { font-size: 1em; padding: 10px; } .container { padding: 15px 20px; } .calculo-detalhe { padding: 15px 20px;} }
-    </style>
-    {# Script MathJax #}
     <script> MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']], processEscapes: true, processEnvironments: true, tags: 'ams' }, options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] } }; </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
 </head>
@@ -49,676 +13,665 @@
         <h1>Memorial de Cálculo Detalhado - LignumCalc</h1>
         <p style="text-align: center; font-style: italic; color: #555; margin-bottom: 30px;">Verificação de Elemento Estrutural Conforme NBR 7190-1:2022</p>
 
-        {# --- Seção 1: Dados de Entrada --- #}
+        <div class="resultado-secao" style="background-color: #f8f9fa; padding: 20px; border-left: 5px solid var(--cor-primaria);">
+            <h2 style="margin-top: 0; border-bottom: none;">Resultado Geral</h2>
+            <p style="font-size: 1.2em; text-align: center; border-bottom: none;">
+                <span style="font-weight: bold;">Status Final da Verificação:</span>
+                {% if resultados.geral_ok %}
+                    <span class="atende" style="font-size: 1.2em; padding: 8px 15px;">APROVADO</span>
+                {% else %}
+                    <span class="nao-atende" style="font-size: 1.2em; padding: 8px 15px;">REPROVADO</span>
+                {% endif %}
+            </p>
+             <div style="text-align: right; margin-top: -40px;">
+                  <button onclick="window.print()" class="botao botao-secundario no-print">Imprimir / Salvar PDF</button>
+             </div>
+        </div>
+        
+        {# NOTA OPCIONAL DE ADVERTÊNCIA #}
+        {% if resultados.geral_ok %}
+        <div class="warning-info" style="text-align: center; margin-top: 10px; margin-bottom: 20px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404;">
+            <strong>Atenção:</strong> O status "APROVADO" é baseado nas verificações selecionadas no formulário. Outras verificações aplicáveis pela NBR 7190 podem não ter sido consideradas neste status geral se não foram selecionadas.
+        </div>
+        {% endif %}
+
+        {# SEÇÃO 1: DADOS DE ENTRADA #}
         <div class="resultado-secao">
             <h2>1. Dados de Entrada</h2>
-            <p><span class="resultado-label">Origem Propriedades:</span> <span class="resultado-valor">{{ resultados['tipo_tabela'].replace('estrutural','Tabela 3 (Peças Estruturais)').replace('nativa','Tabela 2 (Nativas)') }}</span></p>
-            <p><span class="resultado-label">Classe da Madeira:</span> <span class="resultado-valor">{{ resultados['classe_madeira'] }}</span></p>
-            <p><span class="resultado-label">Comprimento ($L$):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['comprimento_m']) }}</span> <span class="unidade">m</span> (<span class="resultado-valor">{{ '%.0f'|format(resultados['comprimento_mm']) }}</span> <span class="unidade">mm</span>)</p>
-            <p><span class="resultado-label">Largura ($b$):</span> <span class="resultado-valor">{{ '%.1f'|format(resultados['largura_mm']) }}</span> <span class="unidade">mm</span></p>
-            <p><span class="resultado-label">Altura ($h$):</span> <span class="resultado-valor">{{ '%.1f'|format(resultados['altura_mm']) }}</span> <span class="unidade">mm</span></p>
-            <p><span class="resultado-label">Classe Carregamento:</span> <span class="resultado-valor">{{ resultados['classe_carregamento'].capitalize() }}</span></p>
-            <p><span class="resultado-label">Classe Umidade (Local):</span> <span class="resultado-valor">{{ resultados['classe_umidade'].replace('_',' ').capitalize() }}</span></p>
-            <p><span class="resultado-label">Tipo Peça (Dim. Mín.):</span> <span class="resultado-valor">{{ resultados['inputs'].get('tipo_peca_dim','principal_isolada').replace('_',' ').capitalize() }}</span></p>
-            <hr style="border-top: 1px dashed #eee; margin: 15px 0;">
-            <p><span class="resultado-label">Tração Paralela Sol. ($N_{sd,t0}$):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['N_sd_t0_input']) }}</span> <span class="unidade">N</span></p>
-            <p><span class="resultado-label">Compressão Paralela Sol. ($N_{sd,c0}$):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['N_sd_c0_input']) }}</span> <span class="unidade">N</span></p>
-            <p><span class="resultado-label">Tração Perpendicular Sol. ($N_{sd,t90}$):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['N_sd_t90_input']) }}</span> <span class="unidade">N</span></p>
-            <p><span class="resultado-label">Compressão Perpendicular Sol. ($N_{sd,c90}$):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['N_sd_c90_input']) }}</span> <span class="unidade">N</span></p>
-            {% if resultados['N_sd_c90_input']|abs > TOL %}
-                 <p><span class="resultado-label">Fator $\alpha_n$ (Comp. Perp.):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['alpha_n']) }}</span></p>
-            {% endif %}
-            <p><span class="resultado-label">Força Cortante Sol. ($V_{sd}$):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['V_sd_input']) }}</span> <span class="unidade">N</span></p>
-            <p><span class="resultado-label">Momento Fletor X Sol. ($M_{sd,x}$ - Input):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['M_sd_x_Nm_input']) }}</span> <span class="unidade">N.m</span></p>
-            <p><span class="resultado-label">Momento Fletor Y Sol. ($M_{sd,y}$ - Input):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['M_sd_y_Nm_input']) }}</span> <span class="unidade">N.m</span></p>
-            {% if resultados.calculos.get('aplicou_exc_min') %}
-                {# LaTeX parece correto aqui #}
-                <p class="nota-excentricidade">
-                    <span class="label">Nota (Excentricidade Mínima Aplicada - Item 6.5.5):</span><br>
-                    <span class="valor"> $e_{\text{min}} = \max(L/{{ 300 if resultados.tipo_madeira_beta_c == 'serrada' else 500 }}, 20 \, \text{mm}) = \max({{ '%.2f'|format(resultados.comprimento_mm / (300 if resultados.tipo_madeira_beta_c == 'serrada' else 500)) }}, 20) = {{ '%.2f'|format(resultados.calculos.e_min_mm) }} \, \text{mm}$</span><br>
-                    <span class="valor"> $M_{sd,x,\text{calc}} = |N_{sd,c0}| \times e_{\text{min}} = |{{ '%.2f'|format(resultados.N_sd_c0_input) }}| \times {{ '%.2f'|format(resultados.calculos.e_min_mm) }} = {{ '%.2f'|format(resultados.calculos.esforcos_finais.Msdx) }} \, \text{N.mm}$</span><br>
-                    <span class="valor"> $M_{sd,y,\text{calc}} = |N_{sd,c0}| \times e_{\text{min}} = |{{ '%.2f'|format(resultados.N_sd_c0_input) }}| \times {{ '%.2f'|format(resultados.calculos.e_min_mm) }} = {{ '%.2f'|format(resultados.calculos.esforcos_finais.Msdy) }} \, \text{N.mm}$</span>
-                </p>
-            {% endif %}
+             <p class="passo-calculo"><span class="label">Origem Propriedades:</span> <span class="valor">{{ resultados.tipo_tabela.replace('estrutural','Tabela 3 (Peças Estruturais)').replace('nativa','Tabela 2 (Nativas)') }}</span></p>
+             <p class="passo-calculo"><span class="label">Classe da Madeira:</span> <span class="valor">{{ resultados.classe_madeira }}</span></p>
+             <p class="passo-calculo"><span class="label">Comprimento ($L$):</span> <span class="valor">{{ '%.2f'|format(resultados.comprimento_m) }}</span> <span class="unidade">m</span> (<span class="valor">{{ '%.0f'|format(resultados.comprimento_mm) }}</span> <span class="unidade">mm</span>)</p>
+             <p class="passo-calculo"><span class="label">Largura ($b$):</span> <span class="valor">{{ '%.1f'|format(resultados.largura_mm) }}</span> <span class="unidade">mm</span></p>
+             <p class="passo-calculo"><span class="label">Altura ($h$):</span> <span class="valor">{{ '%.1f'|format(resultados.altura_mm) }}</span> <span class="unidade">mm</span></p>
+             <p class="passo-calculo"><span class="label">Classe Carregamento:</span> <span class="valor">{{ resultados.classe_carregamento.capitalize() }}</span></p>
+             <p class="passo-calculo"><span class="label">Classe Umidade (Local):</span> <span class="valor">{{ resultados.classe_umidade.replace('_',' ').capitalize() }}</span></p>
+             <p class="passo-calculo"><span class="label">Tipo Peça (Dim. Mín.):</span> <span class="valor">{{ resultados.inputs.get('tipo_peca_dim','principal_isolada').replace('_',' ').capitalize() }}</span></p>
              <hr style="border-top: 1px dashed #eee; margin: 15px 0;">
-            <p><span class="resultado-label">Coef. Flambagem ($K_{e,x}$):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['Ke_x']) }}</span></p>
-            <p><span class="resultado-label">Coef. Flambagem ($K_{e,y}$):</span> <span class="resultado-valor">{{ '%.2f'|format(resultados['Ke_y']) }}</span></p>
-            <p><span class="resultado-label">Tipo Madeira p/ $\beta_c$ (Estabilidade):</span> <span class="resultado-valor">{{ resultados.tipo_madeira_beta_c.capitalize() }}</span> ($\beta_c = {{ '%.1f'|format(resultados.calculos.get('beta_c', 0.0)) }}$)</p>
-             {% if resultados.calculos.esforcos_finais.get('Msdx', 0)|abs > TOL %}
-                 <p><span class="resultado-label">Dist. Travamento Lateral Borda Comprimida ($L_1$):</span> <span class="resultado-valor">{{ '%.0f'|format(resultados['L1_mm']) }}</span> <span class="unidade">mm</span></p>
-            {% endif %}
+             <h4>Esforços Solicitantes (Input)</h4>
+             <p class="passo-calculo"><span class="label">Tração Paralela ELU ($N_{sd,t0}$):</span> <span class="valor">{{ '%.2f'|format(resultados.N_sd_t0_input) }}</span> <span class="unidade">N</span></p>
+             <p class="passo-calculo"><span class="label">Compressão Paralela ELU ($N_{sd,c0}$):</span> <span class="valor">{{ '%.2f'|format(resultados.N_sd_c0_input) }}</span> <span class="unidade">N</span></p>
+             <p class="passo-calculo"><span class="label">Tração Perpendicular ELU ($N_{sd,t90}$):</span> <span class="valor">{{ '%.2f'|format(resultados.N_sd_t90_input) }}</span> <span class="unidade">N</span></p>
+             <p class="passo-calculo"><span class="label">Compressão Perpendicular ELU ($N_{sd,c90}$):</span> <span class="valor">{{ '%.2f'|format(resultados.N_sd_c90_input) }}</span> <span class="unidade">N</span></p>
+             <p class="passo-calculo"><span class="label">Força Cortante ELU ($V_{sd}$):</span> <span class="valor">{{ '%.2f'|format(resultados.V_sd_input) }}</span> <span class="unidade">N</span></p>
+             <p class="passo-calculo"><span class="label">Momento Fletor X ELU ($M_{sd,x}$):</span> <span class="valor">{{ '%.2f'|format(resultados.M_sd_x_Nm_input) }}</span> <span class="unidade">N.m</span></p>
+             <p class="passo-calculo"><span class="label">Momento Fletor Y ELU ($M_{sd,y}$):</span> <span class="valor">{{ '%.2f'|format(resultados.M_sd_y_Nm_input) }}</span> <span class="unidade">N.m</span></p>
+             <p class="passo-calculo"><span class="label">Carga ELS QP Y ($q_{qp,y}$):</span> <span class="valor">{{ '%.2f'|format(resultados.inputs.get('carga_els_qp_y', '0')|float) }}</span> <span class="unidade">N/m</span></p>
+             <p class="passo-calculo"><span class="label">Carga ELS QP X ($q_{qp,x}$):</span> <span class="valor">{{ '%.2f'|format(resultados.inputs.get('carga_els_qp_x', '0')|float) }}</span> <span class="unidade">N/m</span></p>
+             <p class="passo-calculo"><span class="label">Carga ELS Vento Y ($q_{vento,y}$):</span> <span class="valor">{{ '%.2f'|format(resultados.inputs.get('carga_els_vento_y', '0')|float) }}</span> <span class="unidade">N/m</span></p>
+             <p class="passo-calculo"><span class="label">Carga ELS Vento X ($q_{vento,x}$):</span> <span class="valor">{{ '%.2f'|format(resultados.inputs.get('carga_els_vento_x', '0')|float) }}</span> <span class="unidade">N/m</span></p>
+             <hr style="border-top: 1px dashed #eee; margin: 15px 0;">
+             <h4>Parâmetros de Estabilidade e Outros</h4>
+             <p class="passo-calculo"><span class="label">Coef. Flambagem ($K_{e,x}$):</span> <span class="valor">{{ '%.2f'|format(resultados.Ke_x) }}</span></p>
+             <p class="passo-calculo"><span class="label">Coef. Flambagem ($K_{e,y}$):</span> <span class="valor">{{ '%.2f'|format(resultados.Ke_y) }}</span></p>
+             <p class="passo-calculo"><span class="label">Tipo Madeira p/ $\beta_c$ (Estabilidade):</span> <span class="valor">{{ resultados.tipo_madeira_beta_c.capitalize() }}</span> ($\beta_c = {{ '%.1f'|format(resultados.calculos.get('beta_c', 0.0)) }}$)</p>
+             {% if resultados.N_sd_c90_input|abs > TOL %}
+                  <p class="passo-calculo"><span class="label">Fator $\alpha_n$ (Comp. Perp.):</span> <span class="valor">{{ '%.2f'|format(resultados.alpha_n) }}</span></p>
+             {% endif %}
+             {% if resultados.calculos.get('esforcos_finais_elu',{}).get('Msdx',0.0)|abs > TOL %}
+                  <p class="passo-calculo"><span class="label">Dist. Travamento Lateral Borda Comprimida ($L_1$):</span> <span class="valor">{{ '%.0f'|format(resultados.L1_mm) }}</span> <span class="unidade">mm</span></p>
+             {% endif %}
+             {% if resultados.calculos.get('aplicou_exc_min') %}
+                 <div class="nota-excentricidade">
+                    <span class="label">Nota (Excentricidade Mínima Aplicada - Item 6.5.2):</span><br>
+                    <span class="valor"> $e_{\text{min}} = L / {{ 300 if resultados.tipo_madeira_beta_c == 'serrada' else 500 }} = {{ '%.2f'|format(resultados.calculos.get('e_min_mm', 0.0)) }} \, \text{mm}$</span><br>
+                    <span class="valor"> Momentos ELU recalculados: $M_{sd,x,\text{calc}} = {{ '%.3f'|format(resultados.calculos.get('esforcos_finais_elu',{}).get('Msdx', 0.0) / 1000.0) }} \, \text{N.m}$, $M_{sd,y,\text{calc}} = {{ '%.3f'|format(resultados.calculos.get('esforcos_finais_elu',{}).get('Msdy', 0.0) / 1000.0) }} \, \text{N.m}$</span>
+                 </div>
+             {% endif %}
         </div>
 
-        {# --- Seção 2: Propriedades Geométricas --- #}
+        {# SEÇÃO 2: PROPRIEDADES GEOMÉTRICAS #}
         <div class="resultado-secao">
             <h2>2. Propriedades Geométricas Calculadas</h2>
              <div class="calculo-detalhe">
                  <h4>Cálculo das Propriedades Geométricas</h4>
-                 {% set geom = resultados.calculos.geom %}
+                 {% set geom = resultados.calculos.get('geom', {}) %}
                  {% set b_fmt = '%.1f'|format(resultados.largura_mm) %}
                  {% set h_fmt = '%.1f'|format(resultados.altura_mm) %}
-                 {% set area_fmt = '%.1f'|format(geom.area) %}
-                 {% set ix_fmt = '%.0f'|format(geom.I_x) %}
-                 {% set iy_fmt = '%.0f'|format(geom.I_y) %}
-                 {% set h_half_fmt = '%.1f'|format(resultados.altura_mm / 2) %}
-                 {% set b_half_fmt = '%.1f'|format(resultados.largura_mm / 2) %}
-                 {% set wx_fmt = '%.0f'|format(geom.W_x) %}
-                 {% set wy_fmt = '%.0f'|format(geom.W_y) %}
+                 {% set area_fmt = '%.1f'|format(geom.get('area',0.0)) %}
+                 {% set ix_fmt = '%.0f'|format(geom.get('I_x',0.0)) %}
+                 {% set iy_fmt = '%.0f'|format(geom.get('I_y',0.0)) %}
+                 {% set h_half_fmt = '%.1f'|format(resultados.altura_mm / 2.0) %}
+                 {% set b_half_fmt = '%.1f'|format(resultados.largura_mm / 2.0) %}
+                 {% set wx_fmt = '%.0f'|format(geom.get('W_x',0.0)) %}
+                 {% set wy_fmt = '%.0f'|format(geom.get('W_y',0.0)) %}
                  <p class="passo-calculo"><span class="label">Largura da Seção ($b$):</span> <span class="valor">{{ b_fmt }}</span> <span class="unidade">mm</span></p>
                  <p class="passo-calculo"><span class="label">Altura da Seção ($h$):</span> <span class="valor">{{ h_fmt }}</span> <span class="unidade">mm</span></p>
-                 <div class="formula-generica">$$A = b \times h$$</div>
+                 <div class="formula-generica"><span class="math-block">$$A = b \times h$$</span></div>
                  <p class="passo-calculo"><span class="label">Área da Seção Bruta ($A$):</span> <span class="valor">{{ area_fmt }}</span> <span class="unidade">mm²</span> <span class="formula-inline">$ = {{ b_fmt }} \times {{ h_fmt }} $</span></p>
-                 <div class="formula-generica">$$I_x = \frac{b \cdot h^3}{12} \quad ; \quad I_y = \frac{h \cdot b^3}{12}$$</div>
-                 {# Garante chaves para expoentes, embora não estritamente necessário para '3' #}
-                 <p class="passo-calculo"><span class="label">Momento de Inércia ($I_x$):</span> <span class="valor">{{ ix_fmt }}</span> <span class="unidade">mm⁴</span> <span class="formula-inline">$ = \frac{ {{ b_fmt }} \times {{ h_fmt }}^{3} }{12} $</span></p>
-                 <p class="passo-calculo"><span class="label">Momento de Inércia ($I_y$):</span> <span class="valor">{{ iy_fmt }}</span> <span class="unidade">mm⁴</span> <span class="formula-inline">$ = \frac{ {{ h_fmt }} \times {{ b_fmt }}^{3} }{12} $</span></p>
-                 <div class="formula-generica">$$W_x = \frac{I_x}{h/2} \quad ; \quad W_y = \frac{I_y}{b/2}$$</div>
+                 <div class="formula-generica"><span class="math-block">$$I_x = \frac{b \cdot h^3}{12} \quad ; \quad I_y = \frac{h \cdot b^3}{12}$$</span></div>
+                 <p class="passo-calculo"><span class="label">Momento de Inércia ($I_x$):</span> <span class="valor">{{ ix_fmt }}</span> <span class="unidade">mm⁴</span> <span class="formula-inline">$ = \frac{ {{ b_fmt }} \cdot {{ h_fmt }}^{3} }{12} $</span></p>
+                 <p class="passo-calculo"><span class="label">Momento de Inércia ($I_y$):</span> <span class="valor">{{ iy_fmt }}</span> <span class="unidade">mm⁴</span> <span class="formula-inline">$ = \frac{ {{ h_fmt }} \cdot {{ b_fmt }}^{3} }{12} $</span></p>
+                 <div class="formula-generica"><span class="math-block">$$W_x = \frac{I_x}{h/2} \quad ; \quad W_y = \frac{I_y}{b/2}$$</span></div>
                  <p class="passo-calculo"><span class="label">Módulo de Resistência ($W_x$):</span> <span class="valor">{{ wx_fmt }}</span> <span class="unidade">mm³</span> <span class="formula-inline">$ = \frac{ {{ ix_fmt }} }{ {{ h_half_fmt }} } $</span></p>
                  <p class="passo-calculo"><span class="label">Módulo de Resistência ($W_y$):</span> <span class="valor">{{ wy_fmt }}</span> <span class="unidade">mm³</span> <span class="formula-inline">$ = \frac{ {{ iy_fmt }} }{ {{ b_half_fmt }} } $</span></p>
-                 <div class="formula-generica">$$i_x = \sqrt{\frac{I_x}{A}} \quad ; \quad i_y = \sqrt{\frac{I_y}{A}}$$</div>
-                 {# Adiciona chaves {} em \sqrt para garantir #}
-                 <p class="passo-calculo"><span class="label">Raio de Giração ($i_x$):</span> <span class="valor">{{ '%.2f'|format(geom.i_x) }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = \sqrt{ \frac{ {{ ix_fmt }} }{ {{ area_fmt }} } } $</span></p>
-                 <p class="passo-calculo"><span class="label">Raio de Giração ($i_y$):</span> <span class="valor">{{ '%.2f'|format(geom.i_y) }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = \sqrt{ \frac{ {{ iy_fmt }} }{ {{ area_fmt }} } } $</span></p>
+                 <div class="formula-generica"><span class="math-block">$$i_x = \sqrt{\frac{I_x}{A}} \quad ; \quad i_y = \sqrt{\frac{I_y}{A}}$$</span></div>
+                 <p class="passo-calculo"><span class="label">Raio de Giração ($i_x$):</span> <span class="valor">{{ '%.2f'|format(geom.get('i_x',0.0)) }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = \sqrt{ \frac{ {{ ix_fmt }} }{ {{ area_fmt }} } } $</span></p>
+                 <p class="passo-calculo"><span class="label">Raio de Giração ($i_y$):</span> <span class="valor">{{ '%.2f'|format(geom.get('i_y',0.0)) }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = \sqrt{ \frac{ {{ iy_fmt }} }{ {{ area_fmt }} } } $</span></p>
              </div>
         </div>
 
-        {# --- Seção 3: Propriedades da Madeira e Coeficientes --- #}
+        {# SEÇÃO 3: PROPRIEDADES DA MADEIRA E COEFICIENTES #}
         <div class="resultado-secao">
              <h2>3. Propriedades da Madeira e Coeficientes</h2>
              {% set calc = resultados.calculos %}
-             {% set props = calc.props_mad %}
+             {% set props = calc.get('props_mad', {}) %}
              <div class="calculo-detalhe">
                  <h4>Valores Característicos ($f_k, E_k$) e Médios ($E_{\text{med}}$) - NBR 7190 Tab. {{ '3' if resultados.tipo_tabela == 'estrutural' else '2' }} (Classe: {{ resultados.classe_madeira }})</h4>
-                 <p class="passo-calculo"><span class="label">$f_{t0k}$ (Tração Paralela):</span> <span class="valor">{{ '%.2f'|format(props.f_t0k) if props.f_t0k != None else 'N/A' }}</span> <span class="unidade">MPa</span></p>
-                 <p class="passo-calculo"><span class="label">$f_{t90k}$ (Tração Perp.):</span> <span class="valor">{{ '%.2f'|format(props.f_t90k) if props.f_t90k != None else 'N/A' }}</span> <span class="unidade">MPa</span></p>
+                 <p class="passo-calculo"><span class="label">$f_{t0k}$ (Tração Paralela):</span> <span class="valor">{{ '%.2f'|format(props.get('f_t0k', 0.0)) }}</span> <span class="unidade">MPa</span></p>
+                 <p class="passo-calculo"><span class="label">$f_{t90k}$ (Tração Perp.):</span> <span class="valor">{{ '%.2f'|format(props.get('f_t90k', 0.0)) }}</span> <span class="unidade">MPa</span></p>
                  <p class="passo-calculo"><span class="label">$f_{c0k}$ (Comp. Paralela):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_c0k', 0.0)) }}</span> <span class="unidade">MPa</span></p>
-                 <p class="passo-calculo"><span class="label">$f_{c90k}$ (Comp. Perp.):</span> <span class="valor">{{ '%.2f'|format(props.f_c90k) if props.f_c90k != None else 'N/A' }}</span> <span class="unidade">MPa</span></p>
+                 <p class="passo-calculo"><span class="label">$f_{c90k}$ (Comp. Perp.):</span> <span class="valor">{{ '%.2f'|format(props.get('f_c90k', 0.0)) }}</span> <span class="unidade">MPa</span></p>
                  <p class="passo-calculo"><span class="label">$f_{vk}$ (Cisalhamento):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_vk', 0.0)) }}</span> <span class="unidade">MPa</span></p>
-                 <p class="passo-calculo"><span class="label">$f_{mk}$ (Flexão):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_mk') if calc.get('f_mk') is not none else calc.get('f_mk_estimado', 0.0)) }}</span> <span class="unidade">MPa</span> {% if calc.get('f_mk') is none and resultados.tipo_tabela == 'nativa' %} <small>(Estimado = $f_{c0k}$)</small>{% endif %}</p>
+                 <p class="passo-calculo"><span class="label">$f_{mk}$ (Flexão):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_mk', 0.0) if calc.get('f_mk') is number else calc.get('f_mk_estimado', 0.0)) }}</span> <span class="unidade">MPa</span> {% if calc.get('f_mk') is none and resultados.tipo_tabela == 'nativa' %} <small>(Estimado = $f_{c0k}$)</small>{% endif %}</p>
                  <p class="passo-calculo"><span class="label">$E_{0,\text{med}}$ (Módulo Elas. Médio):</span> <span class="valor">{{ '%.0f'|format(calc.get('E_0med', 0.0)) }}</span> <span class="unidade">MPa</span></p>
                  <p class="passo-calculo"><span class="label">$E_{0,05}$ (Módulo Elas. Caract.):</span> <span class="valor">{{ '%.0f'|format(calc.get('E_005', 0.0)) }}</span> <span class="unidade">MPa</span></p>
+                 <p class="passo-calculo"><span class="label">$G_{\text{med}}$ (Módulo Cisalhamento Médio):</span> <span class="valor">{{ '%.0f'|format(calc.get('G_med', 0.0) if calc.get('G_med') is number else 0.0) }}</span> <span class="unidade">MPa</span> <small>(Estimado = $E_{0,med}/16$)</small></p>
              </div>
              <div class="calculo-detalhe">
                  <h4>Coeficiente de Modificação $k_{\text{mod}}$ (Item 5.8.4)</h4>
-                 {% set kmod1_fmt = '%.2f'|format(calc.get('kmod1', 0.0)) %}
-                 {% set kmod2_fmt = '%.2f'|format(calc.get('kmod2', 0.0)) %}
-                 {% set kmod_fmt = '%.2f'|format(calc.get('k_mod', 0.0)) %}
+                 {% set kmod1_fmt = '%.2f'|format(calc.get('kmod1',0.0)) %}
+                 {% set kmod2_fmt = '%.2f'|format(calc.get('kmod2',0.0)) %}
+                 {% set kmod_fmt = '%.2f'|format(calc.get('k_mod',0.0)) %}
                  <p class="passo-calculo"><span class="label">$k_{\text{mod1}}$ (Classe Carregamento: {{ resultados.classe_carregamento.capitalize() }} - Tabela 4):</span> <span class="valor">{{ kmod1_fmt }}</span> </p>
                  <p class="passo-calculo"><span class="label">$k_{\text{mod2}}$ (Classe Umidade: {{ resultados.classe_umidade.replace('_',' ').capitalize() }} - Tabela 5):</span> <span class="valor">{{ kmod2_fmt }}</span> </p>
-                 <div class="formula-generica">$$k_{\text{mod}} = k_{\text{mod1}} \times k_{\text{mod2}}$$</div>
+                 <div class="formula-generica"><span class="math-block">$$k_{\text{mod}} = k_{\text{mod1}} \times k_{\text{mod2}}$$</span></div>
                  <p class="passo-calculo"><span class="label">Cálculo $k_{\text{mod}}$:</span> <span class="valor">{{ kmod_fmt }}</span> <span class="formula-inline">$ = {{ kmod1_fmt }} \times {{ kmod2_fmt }} $</span></p>
              </div>
              <div class="calculo-detalhe">
-                 <h4>Resistências de Cálculo ($f_d$) - (Item 6.2.6)</h4>
-                 {% set ft0k_fmt = '%.2f'|format(props.f_t0k) if props.f_t0k != None else 'N/A' %}
-                 {% set ft90k_fmt = '%.2f'|format(props.f_t90k) if props.f_t90k != None else 'N/A' %}
-                 {% set fc0k_fmt = '%.2f'|format(calc.get('f_c0k', 0.0)) %}
-                 {% set fc90k_fmt = '%.2f'|format(props.f_c90k) if props.f_c90k != None else 'N/A' %}
-                 {% set fvk_fmt = '%.2f'|format(calc.get('f_vk', 0.0)) %}
-                 {% set fmk_fmt = '%.2f'|format(calc.get('f_mk') if calc.get('f_mk') is not none else calc.get('f_mk_estimado', 0.0)) %}
-                 {% set ft0d_fmt = '%.2f'|format(calc.get('f_t0d', 0.0)) %}
-                 {% set fc0d_fmt = '%.2f'|format(calc.get('f_c0d', 0.0)) %}
+                 <h4>Resistências de Cálculo ($f_d$) - ELU (Item 6.2.6)</h4>
+                 {% set ft0k_val = calc.get('f_t0k', 0.0) %} {% set ft90k_val = calc.get('f_t90k', 0.0) %}
+                 {% set fc0k_val = calc.get('f_c0k', 0.0) %} {% set fc90k_val = calc.get('f_c90k', 0.0) %}
+                 {% set fvk_val = calc.get('f_vk', 0.0) %} {% set fmk_val = calc.get('f_mk', 0.0) %}
+                 {% set ft0k_fmt = '%.2f'|format(ft0k_val) %} {% set ft90k_fmt = '%.2f'|format(ft90k_val) %}
+                 {% set fc0k_fmt = '%.2f'|format(fc0k_val) %} {% set fc90k_fmt = '%.2f'|format(fc90k_val) %}
+                 {% set fvk_fmt = '%.2f'|format(fvk_val) %} {% set fmk_fmt = '%.2f'|format(fmk_val) %}
+                 {% set ft0d_fmt = '%.2f'|format(calc.get('f_t0d', 0.0)) %} {% set ft90d_fmt = '%.2f'|format(calc.get('f_t90d', 0.0)) %}
+                 {% set fc0d_fmt = '%.2f'|format(calc.get('f_c0d', 0.0)) %} {% set fc90d_fmt = '%.2f'|format(calc.get('f_c90d', 0.0)) %}
+                 {% set fvd_fmt = '%.2f'|format(calc.get('f_vd', 0.0)) %} {% set fmd_fmt = '%.2f'|format(calc.get('f_md', 0.0)) %}
                  {% set alpha_n_fmt = '%.2f'|format(resultados.alpha_n) %}
-                 <p class="passo-calculo"><span class="label">Coeficientes de Minoração ($\gamma_w$ - Item 5.8.5):</span> <span class="valor"> $\gamma_c = 1.4$, $\gamma_t = 1.4$, $\gamma_m = 1.4$, $\gamma_v = 1.8$</span></p>
-                 <div class="formula-generica">$$f_d = \frac{k_{\text{mod}} \cdot f_k}{\gamma_w}$$</div>
-                 <p class="passo-calculo"><span class="label">$f_{t0,d}$ (Tração Paralela):</span> <span class="valor">{{ ft0d_fmt }}</span> <span class="unidade">MPa</span> {% if ft0k_fmt != 'N/A' %}<span class="formula-inline">$ = \frac{ {{ kmod_fmt }} \times {{ ft0k_fmt }} }{1.4} $</span>{% endif %}</p>
-                 {# Usando \text{min} ao invés de \min para clareza, \left \right para delimitadores #}
-                 <p class="passo-calculo"><span class="label">$f_{t90,d}$ (Tração Perp.):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_t90d', 0.0)) }}</span> <span class="unidade">MPa</span> {% if ft90k_fmt != 'N/A' and ft0d_fmt is number %}<span class="formula-inline">$ = \text{min}\left( \frac{ {{ kmod_fmt }} \times {{ ft90k_fmt }} }{1.4} \, ; \, 0.06 \times {{ ft0d_fmt }} \right) $</span>{% endif %}</p>
-                 <p class="passo-calculo"><span class="label">$f_{c0,d}$ (Comp. Paralela):</span> <span class="valor">{{ fc0d_fmt }}</span> <span class="unidade">MPa</span> {% if fc0k_fmt != 'N/A' %}<span class="formula-inline">$ = \frac{ {{ kmod_fmt }} \times {{ fc0k_fmt }} }{1.4} $</span>{% endif %}</p>
-                 <p class="passo-calculo"><span class="label">$f_{c90,d}$ (Comp. Perp.):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_c90d', 0.0)) }}</span> <span class="unidade">MPa</span> {% if fc90k_fmt != 'N/A' and fc0d_fmt is number %}<span class="formula-inline">$ = \text{min}\left( \frac{ {{ kmod_fmt }} \times {{ fc90k_fmt }} }{1.4} \, ; \, 0.25 \times {{ fc0d_fmt }} \times \alpha_n \right) $</span> (com $\alpha_n = {{ alpha_n_fmt }}$){% endif %}</p>
-                 <p class="passo-calculo"><span class="label">$f_{v,d}$ (Cisalhamento):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_vd', 0.0)) }}</span> <span class="unidade">MPa</span> {% if fvk_fmt != 'N/A' %}<span class="formula-inline">$ = \frac{ {{ kmod_fmt }} \times {{ fvk_fmt }} }{1.8} $</span>{% endif %}</p>
-                 <p class="passo-calculo"><span class="label">$f_{m,d}$ (Flexão):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_md', 0.0)) }}</span> <span class="unidade">MPa</span> {% if fmk_fmt != 'N/A' and calc.f_mk is not none %}<span class="formula-inline">$ = \frac{ {{ kmod_fmt }} \times {{ fmk_fmt }} }{1.4} $</span>{% elif calc.f_md_estimado %}<small>(Estimado = $f_{c0d}$)</small>{% endif %} </p>
-                 <p class="passo-calculo"><span class="label">$k_{M}$ (Coef. Flexão/Comb. - Item 6.3.5):</span> <span class="valor">{{ '%.1f'|format(calc.get('k_M', 0.7)) }}</span> {% if calc.get('k_M', 0.7) == 1.0 %}<small>(Seção não retangular ou quadrada)</small>{% else %}<small>(Seção retangular)</small>{% endif %}</p>
+
+                 <p class="passo-calculo"><span class="label">Coeficientes de Minoração ($\gamma_w$ - Item 5.8.5):</span> <span class="valor"> $\gamma_c = {{ GAMMA_C }}$, $\gamma_t = {{ GAMMA_T }}$, $\gamma_m = {{ GAMMA_M }}$, $\gamma_v = {{ GAMMA_V }}$</span></p>
+                 <div class="formula-generica"><span class="math-block">$$f_d = \frac{k_{\text{mod}} \cdot f_k}{\gamma_w}$$</span></div>
+                 <p class="passo-calculo"><span class="label">$f_{t0,d}$ (Tração Paralela):</span> <span class="valor">{{ ft0d_fmt }}</span> <span class="unidade">MPa</span> {% if ft0k_val is number %}<span class="formula-inline">$ = \frac{ {{ kmod_fmt }} \times {{ ft0k_fmt }} }{ {{ GAMMA_T }} } $</span>{% endif %}</p>
+                 <p class="passo-calculo"><span class="label">$f_{t90,d}$ (Tração Perp.):</span> <span class="valor">{{ ft90d_fmt }}</span> <span class="unidade">MPa</span> {% if ft90k_val is number and calc.get('f_t0d', 0.0) is number %}<span class="formula-inline">$ = \min\left( \frac{ {{ kmod_fmt }} \times {{ ft90k_fmt }} }{ {{ GAMMA_T }} } \, ; \, 0.06 \times {{ ft0d_fmt }} \right) $</span>{% endif %}</p>
+                 <p class="passo-calculo"><span class="label">$f_{c0,d}$ (Comp. Paralela):</span> <span class="valor">{{ fc0d_fmt }}</span> <span class="unidade">MPa</span> {% if fc0k_val is number %}<span class="formula-inline">$ = \frac{ {{ kmod_fmt }} \times {{ fc0k_fmt }} }{ {{ GAMMA_C }} } $</span>{% endif %}</p>
+                 <p class="passo-calculo"><span class="label">$f_{c90,d}$ (Comp. Perp.):</span> <span class="valor">{{ fc90d_fmt }}</span> <span class="unidade">MPa</span> {% if fc90k_val is number and calc.get('f_c0d', 0.0) is number %}<span class="formula-inline">$ = \min\left( \frac{ {{ kmod_fmt }} \times {{ fc90k_fmt }} }{ {{ GAMMA_C }} } \, ; \, 0.25 \times {{ fc0d_fmt }} \times \alpha_n \right) $</span> (com $\alpha_n = {{ alpha_n_fmt }}$){% endif %}</p>
+                 <p class="passo-calculo"><span class="label">$f_{v,d}$ (Cisalhamento):</span> <span class="valor">{{ fvd_fmt }}</span> <span class="unidade">MPa</span> {% if fvk_val is number %}<span class="formula-inline">$ = \frac{ {{ kmod_fmt }} \times {{ fvk_fmt }} }{ {{ GAMMA_V }} } $</span>{% endif %}</p>
+                 <p class="passo-calculo"><span class="label">$f_{m,d}$ (Flexão):</span> <span class="valor">{{ fmd_fmt }}</span> <span class="unidade">MPa</span> {% if fmk_val is number and not calc.get('f_md_estimado', False) %}<span class="formula-inline">$ = \frac{ {{ kmod_fmt }} \times {{ fmk_fmt }} }{ {{ GAMMA_M }} } $</span>{% elif calc.get('f_md_estimado', False) %}<small>(Estimado = $f_{c0d}$)</small>{% endif %} </p>
              </div>
+              <div class="calculo-detalhe">
+                  <h4>Módulos de Elasticidade para Cálculo</h4>
+                  {% set E0med_fmt = '%.0f'|format(calc.get('E_0med',0.0)) %}
+                  {% set E005_fmt = '%.0f'|format(calc.get('E_005',0.0)) %}
+                  {% set E0ef_fmt = '%.0f'|format(calc.get('E_0ef',0.0)) %}
+                  {% set Gmed_fmt = '%.0f'|format(calc.get('G_med', 0.0) if calc.get('G_med') is number else 0.0) %}
+
+                  <p class="passo-calculo"><span class="label">$E_{0,med}$ (Para ELS - Flechas - NBR 7190 It 8.1):</span> <span class="valor">{{ E0med_fmt }}</span> <span class="unidade">MPa</span></p>
+                  <div class="formula-generica"><span class="math-block">$$E_{0,ef} = k_{\text{mod}} \times E_{0,med}$$</span></div>
+                  <p class="passo-calculo"><span class="label">$E_{0,ef}$ (Para ELU - Estabilidade Lateral - NBR 7190 It 5.8.7):</span> <span class="valor">{{ E0ef_fmt }}</span> <span class="unidade">MPa</span> <span class="formula-inline">$ = {{ kmod_fmt }} \times {{ E0med_fmt }} $</span></p>
+                  <p class="passo-calculo"><span class="label">$E_{0,05}$ (Para ELU - Estabilidade Compressão - NBR 7190 It 6.5.4):</span> <span class="valor">{{ E005_fmt }}</span> <span class="unidade">MPa</span> {% if resultados.tipo_tabela == 'nativa' %}<small>(Estimado = $0.7 \times E_{c0,med}$)</small>{% endif %}</p>
+                  <div class="formula-generica"><span class="math-block">$$G_{med} \approx \frac{E_{0,med}}{16}$$</span></div>
+                  <p class="passo-calculo"><span class="label">$G_{med}$ (Para ELS - Deformação Cisalhamento - NBR 7190 It 5.8.7):</span> <span class="valor">{{ Gmed_fmt }}</span> <span class="unidade">MPa</span> <span class="formula-inline">$ \approx \frac{ {{E0med_fmt}} }{16} $</span></p>
+              </div>
+              <div class="calculo-detalhe">
+                 <h4>Coeficientes para Verificações Combinadas</h4>
+                  <p class="passo-calculo"><span class="label">$k_{M}$ (Coef. Flexão/Comb. - Item 6.3.5):</span> <span class="valor">{{ '%.1f'|format(calc.get('k_M',0.0)) }}</span> {% if calc.get('k_M',0.0) == 1.0 %}<small>(Seção não retangular ou quadrada)</small>{% else %}<small>(Seção retangular)</small>{% endif %}</p>
+                  <p class="passo-calculo"><span class="label">$\beta_c$ (Fator Estabilidade Compressão - Item 6.5.5):</span> <span class="valor">{{ '%.1f'|format(calc.get('beta_c',0.0)) }}</span> <small>({{ resultados.tipo_madeira_beta_c }})</small></p>
+              </div>
+        </div>
+        
+        {# --- Seção 4: Verificações Detalhadas (ELS) --- #}
+        <div class="resultado-secao">
+            <h2>4. Verificações Detalhadas (ELS)</h2>
+            {% set alguma_verificacao_els_renderizada = false %}
+            {% set calc = resultados.calculos %}
+            {% set geom = calc.get('geom', {}) %}
+            {% set v_qp = resultados.verificacoes.get('flechas_qp', {}) %}
+            {% if resultados.mostrar_verificacoes.get('flechas_qp', False) and v_qp.get('verificacao_aplicavel', False) %}
+                {% set alguma_verificacao_els_renderizada = true %}
+                <div class="calculo-detalhe">
+                    <h4>Flechas - Combinação Quase-Permanente (Item 8.1)</h4>
+                     {% if v_qp.get('erro') %}
+                        <p class="error-in-verification">Erro na verificação: {{ v_qp.get('erro') }}</p>
+                     {% else %}
+                        {% set q_qp_x_val = resultados.calculos.esforcos_finais_els_N_mm.get('q_qp_x', 0.0) %}
+                        {% set q_qp_y_val = resultados.calculos.esforcos_finais_els_N_mm.get('q_qp_y', 0.0) %}
+                        {% set q_qp_x_fmt = '%.1f'|format(q_qp_x_val * 1000.0) %}
+                        {% set q_qp_y_fmt = '%.1f'|format(q_qp_y_val * 1000.0) %}
+                        {% set L_mm_fmt = '%.0f'|format(resultados.comprimento_mm) %}
+                        {% set E_usado_fmt = '%.0f'|format(calc.get('E_0med',0.0)) %} {# CORRIGIDO AQUI #}
+                        {% set Ix_fmt = '%.0f'|format(geom.get('I_x',0.0)) %}
+                        {% set Iy_fmt = '%.0f'|format(geom.get('I_y',0.0)) %}
+                        {% set delta_inst_x_fmt = '%.3f'|format(v_qp.get('delta_inst_x',0.0)) %}
+                        {% set delta_inst_y_fmt = '%.3f'|format(v_qp.get('delta_inst_y',0.0)) %}
+                        {% set phi_fmt = '%.2f'|format(v_qp.get('phi',0.0)) %}
+                        {% set delta_x_fin_fmt = '%.3f'|format(v_qp.get('delta_x_final',0.0)) %}
+                        {% set delta_y_fin_fmt = '%.3f'|format(v_qp.get('delta_y_final',0.0)) %}
+                        {% set delta_lim_fmt = '%.2f'|format(v_qp.get('delta_limite', 0.0)) %}
+                        {% set delta_res_fmt = '%.3f'|format(v_qp.get('delta_resultante',0.0)) %}
+
+                        <h5>Cálculo da Flecha Instantânea ($\delta_{inst}$)</h5>
+                        <p class="passo-calculo"><span class="label">Carga Quase-Permanente ($q_{qp,x}, q_{qp,y}$):</span> <span class="valor">{{ q_qp_x_fmt }}, {{ q_qp_y_fmt }}</span> <span class="unidade">N/m</span></p>
+                        <p class="passo-calculo"><span class="label">Vão ($L$):</span> <span class="valor">{{ L_mm_fmt }}</span> <span class="unidade">mm</span></p>
+                        <p class="passo-calculo"><span class="label">Módulo de Elasticidade (Usado: $E_{0,med}$):</span> <span class="valor">{{ E_usado_fmt }}</span> <span class="unidade">MPa</span> <small>(NBR 7190 It 8.1)</small></p> {# CORRIGIDO AQUI #}
+                        <p class="passo-calculo"><span class="label">Momentos de Inércia ($I_x, I_y$):</span> <span class="valor">{{ Ix_fmt }}, {{ Iy_fmt }}</span> <span class="unidade">mm⁴</span></p>
+                        <div class="formula-generica"><span class="math-block">$$\delta_{inst} = \frac{5 \cdot q \cdot L^4}{384 \cdot E \cdot I}$$</span> <small>(Fórmula simplificada para viga biapoiada, carga distribuída. Desconsidera cisalhamento. $q$ em N/mm)</small></div>
+
+                        <p class="passo-calculo"><span class="label">Flecha Instantânea em Y ($\delta_{inst,y}$):</span> <span class="valor">{{ delta_inst_y_fmt }}</span> <span class="unidade">mm</span>
+                            {% if q_qp_y_val|abs * 1000.0 > TOL %}
+                                <span class="formula-inline">$ = \frac{5 \cdot ({{ '%.3f'|format(q_qp_y_val) }}) \cdot {{ L_mm_fmt }}^4}{384 \cdot {{ E_usado_fmt }} \cdot {{ Ix_fmt }} }$</span>
+                            {% else %}
+                                <small>(Carga nula)</small>
+                            {% endif %}
+                        </p>
+                        <p class="passo-calculo"><span class="label">Flecha Instantânea em X ($\delta_{inst,x}$):</span> <span class="valor">{{ delta_inst_x_fmt }}</span> <span class="unidade">mm</span>
+                            {% if q_qp_x_val|abs * 1000.0 > TOL %}
+                                <span class="formula-inline">$ = \frac{5 \cdot ({{ '%.3f'|format(q_qp_x_val) }}) \cdot {{ L_mm_fmt }}^4}{384 \cdot {{ E_usado_fmt }} \cdot {{ Iy_fmt }} }$</span>
+                            {% else %}
+                                <small>(Carga nula)</small>
+                            {% endif %}
+                        </p>
+
+                        <h5>Cálculo da Flecha Final ($\delta_{fin}$)</h5>
+                        <p class="passo-calculo"><span class="label">Coeficiente de Fluência ($\phi$ - Tabela 20):</span> <span class="valor">{{ phi_fmt }}</span> <small>(Classe Umidade: {{ resultados.classe_umidade.replace('_',' ') }}, Tipo: {{ resultados.tipo_madeira_beta_c }})</small></p>
+                        <div class="formula-generica"><span class="math-block">$$\delta_{fin} = \delta_{inst, Gk+Qpk,\psi_2} \cdot (1 + \phi)$$</span> <small>(NBR 7190 Eq. 23, considerando $\delta_{inst}$ da carga QP total)</small></div>
+                        <p class="passo-calculo"><span class="label">Flecha Final em Y ($\delta_{fin,y}$):</span> <span class="valor">{{ delta_y_fin_fmt }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = {{ delta_inst_y_fmt }} \times (1 + {{ phi_fmt }}) $</span></p>
+                        <p class="passo-calculo"><span class="label">Flecha Final em X ($\delta_{fin,x}$):</span> <span class="valor">{{ delta_x_fin_fmt }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = {{ delta_inst_x_fmt }} \times (1 + {{ phi_fmt }}) $</span></p>
+
+                        <h5>Verificação Final</h5>
+                        <div class="formula-generica"><span class="math-block">$$\delta_{res,fin} = \sqrt{\delta_{fin,x}^2 + \delta_{fin,y}^2} \quad ; \quad \delta_{lim} = \frac{L}{250}$$</span> <small>(Limite para $\delta_{net,fin}$ para viga biapoiada - Tabela 21, considerando contraflecha nula)</small></div>
+                        <p class="passo-calculo"><span class="label">Flecha Resultante Final ($\delta_{res,fin}$):</span> <span class="valor">{{ delta_res_fmt }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = \sqrt{ {{ delta_x_fin_fmt }}^2 + {{ delta_y_fin_fmt }}^2 } $</span></p>
+                        <p class="passo-calculo"><span class="label">Limite de Flecha ($\delta_{lim}$):</span> <span class="valor">{{ delta_lim_fmt }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = {{ L_mm_fmt }} / 250 $</span></p>
+                        <div class="resultado-check">
+                            <span class="status-text">
+                                Verificação: ${{ delta_res_fmt }} \text{ mm} \le {{ delta_lim_fmt }} \text{ mm}$ ? 
+                                (Razão: {{ v_qp.get('ratio_formatado', 'N/A') }})
+                            </span>
+                            {% if v_qp.get('passou') %}<span class="atende">APROVADO</span>
+                            {% elif v_qp.get('passou') == False %}<span class="nao-atende">REPROVADO</span>
+                            {% else %}<span class="not-applicable">(N/A)</span>
+                            {% endif %}
+                        </div>
+                     {% endif %}
+                 </div>
+             {% endif %}
+
+             {% set v_vento = resultados.verificacoes.get('flechas_vento', {}) %}
+             {% if resultados.mostrar_verificacoes.get('flechas_vento', False) and v_vento.get('verificacao_aplicavel', False) %}
+                 {% set alguma_verificacao_els_renderizada = true %}
+                 <div class="calculo-detalhe">
+                    <h4>Flechas - Combinação Vento Sucção (Item 8.1)</h4>
+                     {% if v_vento.get('erro') %}
+                        <p class="error-in-verification">Erro na verificação: {{ v_vento.get('erro') }}</p>
+                     {% else %}
+                        {% set q_vento_x_val = resultados.calculos.esforcos_finais_els_N_mm.get('q_vento_x', 0.0) %}
+                        {% set q_vento_y_val = resultados.calculos.esforcos_finais_els_N_mm.get('q_vento_y', 0.0) %}
+                        {% set q_vento_x_fmt = '%.1f'|format(q_vento_x_val * 1000.0) %}
+                        {% set q_vento_y_fmt = '%.1f'|format(q_vento_y_val * 1000.0) %}
+                        {% set L_mm_fmt = '%.0f'|format(resultados.comprimento_mm) %}
+                        {% set E_usado_fmt = '%.0f'|format(calc.get('E_0med',0.0)) %} {# CORRIGIDO AQUI #}
+                        {% set Ix_fmt = '%.0f'|format(geom.get('I_x',0.0)) %}
+                        {% set Iy_fmt = '%.0f'|format(geom.get('I_y',0.0)) %}
+                        {% set delta_inst_x_vento_fmt = '%.3f'|format(v_vento.get('delta_inst_x',0.0)) %}
+                        {% set delta_inst_y_vento_fmt = '%.3f'|format(v_vento.get('delta_inst_y',0.0)) %}
+                        {% set phi_vento_fmt = '%.2f'|format(v_vento.get('phi',0.0)) %} {# Embora não usual para vento, está no cálculo do exercício #}
+                        {% set delta_x_fin_vento_fmt = '%.3f'|format(v_vento.get('delta_x_final',0.0)) %} {# Este é delta_inst * (1+phi) #}
+                        {% set delta_y_fin_vento_fmt = '%.3f'|format(v_vento.get('delta_y_final',0.0)) %} {# Este é delta_inst * (1+phi) #}
+                        {% set delta_lim_vento_fmt = '%.2f'|format(v_vento.get('delta_limite',0.0)) %}
+                        {% set delta_res_vento_fmt = '%.3f'|format(v_vento.get('delta_resultante',0.0)) %} {# Este é sqrt(delta_fin_x^2 + delta_fin_y^2) #}
+
+                        <h5>Cálculo da Flecha Instantânea ($\delta_{inst}$)</h5>
+                        <p class="passo-calculo"><span class="label">Carga Vento ($q_{vento,x}, q_{vento,y}$):</span> <span class="valor">{{ q_vento_x_fmt }}, {{ q_vento_y_fmt }}</span> <span class="unidade">N/m</span></p>
+                        <p class="passo-calculo"><span class="label">Vão ($L$):</span> <span class="valor">{{ L_mm_fmt }}</span> <span class="unidade">mm</span></p>
+                        <p class="passo-calculo"><span class="label">Módulo de Elasticidade (Usado: $E_{0,med}$):</span> <span class="valor">{{ E_usado_fmt }}</span> <span class="unidade">MPa</span> <small>(NBR 7190 It 8.1 - seguindo exercício para aplicação com $\phi$)</small></p> {# CORRIGIDO AQUI #}
+                        <p class="passo-calculo"><span class="label">Momentos de Inércia ($I_x, I_y$):</span> <span class="valor">{{ Ix_fmt }}, {{ Iy_fmt }}</span> <span class="unidade">mm⁴</span></p>
+                        <div class="formula-generica"><span class="math-block">$$\delta_{inst} = \frac{5 \cdot q \cdot L^4}{384 \cdot E \cdot I}$$</span> <small>($q$ em N/mm)</small></div>
+                        <p class="passo-calculo"><span class="label">Flecha Instantânea em Y ($\delta_{inst,y}$):</span> <span class="valor">{{ delta_inst_y_vento_fmt }}</span> <span class="unidade">mm</span>
+                            {% if q_vento_y_val|abs * 1000.0 > TOL %}
+                                <span class="formula-inline">$ = \frac{5 \cdot ({{ '%.3f'|format(q_vento_y_val) }}) \cdot {{ L_mm_fmt }}^4}{384 \cdot {{ E_usado_fmt }} \cdot {{ Ix_fmt }} }$</span>
+                            {% else %}
+                                <small>(Carga nula)</small>
+                            {% endif %}
+                        </p>
+                        <p class="passo-calculo"><span class="label">Flecha Instantânea em X ($\delta_{inst,x}$):</span> <span class="valor">{{ delta_inst_x_vento_fmt }}</span> <span class="unidade">mm</span>
+                            {% if q_vento_x_val|abs * 1000.0 > TOL %}
+                                <span class="formula-inline">$ = \frac{5 \cdot ({{ '%.3f'|format(q_vento_x_val) }}) \cdot {{ L_mm_fmt }}^4}{384 \cdot {{ E_usado_fmt }} \cdot {{ Iy_fmt }} }$</span>
+                            {% else %}
+                                <small>(Carga nula)</small>
+                            {% endif %}
+                        </p>
+
+                        <h5>Cálculo da Flecha Final ($\delta_{fin}$)</h5>
+                        <p class="passo-calculo"><span class="label">Coeficiente de Fluência ($\phi$):</span> <span class="valor">{{ phi_vento_fmt }}</span></p>
+                        <div class="formula-generica"><span class="math-block">$$\delta_{fin,vento} = \delta_{inst,vento} \cdot (1 + \phi)$$</span> <small>()</small></div>
+                        <p class="passo-calculo"><span class="label">Flecha Final em Y ($\delta_{fin,y}$):</span> <span class="valor">{{ delta_y_fin_vento_fmt }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = {{ delta_inst_y_vento_fmt }} \times (1 + {{ phi_vento_fmt }}) $</span></p>
+                        <p class="passo-calculo"><span class="label">Flecha Final em X ($\delta_{fin,x}$):</span> <span class="valor">{{ delta_x_fin_vento_fmt }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = {{ delta_inst_x_vento_fmt }} \times (1 + {{ phi_vento_fmt }}) $</span></p>
+
+                        <h5>Verificação Final (Considerando $\delta_{fin,vento}$ vs L/250)</h5>
+                        <div class="formula-generica"><span class="math-block">$$\delta_{res,fin,vento} = \sqrt{\delta_{fin,x}^2 + \delta_{fin,y}^2} \quad ; \quad \delta_{lim} = \frac{L}{250}$$</span> <small>(Limite para $\delta_{net,fin}$ Tabela 21)</small></div>
+                        <p class="passo-calculo"><span class="label">Flecha Resultante Final ($\delta_{res,fin,vento}$):</span> <span class="valor">{{ delta_res_vento_fmt }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = \sqrt{ {{ delta_x_fin_vento_fmt }}^2 + {{ delta_y_fin_vento_fmt }}^2 } $</span></p>
+                        <p class="passo-calculo"><span class="label">Limite de Flecha ($\delta_{lim}$):</span> <span class="valor">{{ delta_lim_vento_fmt }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = {{ L_mm_fmt }} / 250 $</span></p>
+                         <div class="resultado-check">
+                             <span class="status-text">
+                                Verificação: ${{ '%.3f'|format(abs(v_vento.get('delta_resultante',0.0))) }} \text{ mm} \le {{ delta_lim_vento_fmt }} \text{ mm}$ ?
+                                (Razão: {{ v_vento.get('ratio_formatado', 'N/A') }})
+                            </span>
+                             {% if v_vento.get('passou') %}<span class="atende">APROVADO</span>
+                             {% elif v_vento.get('passou') == False %}<span class="nao-atende">REPROVADO</span>
+                             {% else %}<span class="not-applicable">(N/A)</span>
+                             {% endif %}
+                         </div>
+                     {% endif %}
+                 </div>
+             {% endif %}
+
+            {% if resultados.mostrar_verificacoes.get('flechas_els', False) and not alguma_verificacao_els_renderizada %}
+                 <div class="calculo-detalhe no-verifications-notice">
+                     <p>A verificação de flechas ELS foi selecionada, mas nenhuma carga ELS relevante foi fornecida ou as condições de aplicabilidade não foram atendidas.</p>
+                 </div>
+            {% elif not resultados.mostrar_verificacoes.get('flechas_els', False) and not alguma_verificacao_els_renderizada %}
+                <div class="calculo-detalhe no-verifications-notice">
+                     <p>A verificação de flechas ELS não foi selecionada para exibição neste relatório.</p>
+                </div>
+            {% endif %}
         </div>
 
-        {# --- Seção 4: Verificações Detalhadas (ELU) --- #}
-        <div class="resultado-secao">
-            <h2>4. Verificações Detalhadas (ELU)</h2>
-            {% set verificacao_map = {
-                 'dimensoes': {'titulo': 'Dimensões Mínimas (Item 9.2.1)', 'chave_mostrar': 'dimensoes'},
-                 'tracao_simples': {'titulo': 'Tração Paralela às Fibras (Item 6.3.2)', 'chave_mostrar': 'tracao_simples'},
-                 'tracao_perpendicular': {'titulo': 'Tração Perpendicular às Fibras (Item 6.2.3)', 'chave_mostrar': 'tracao_perpendicular'},
-                 'compressao_simples_resistencia': {'titulo': 'Compressão Paralela (Resistência e Estabilidade)', 'chave_mostrar': 'compressao_simples_resistencia'},
-                 'compressao_perpendicular': {'titulo': 'Compressão Perpendicular às Fibras (Item 6.3.3)', 'chave_mostrar': 'compressao_perpendicular'},
-                 'flexao_simples_reta': {'titulo': 'Flexão Simples Reta (Item 6.3.4)', 'chave_mostrar': 'flexao_simples_reta'},
-                 'flexao_obliqua': {'titulo': 'Flexão Simples Oblíqua (Item 6.3.5)', 'chave_mostrar': 'flexao_obliqua'},
-                 'flexotracao': {'titulo': 'Flexotração (Item 6.3.6)', 'chave_mostrar': 'flexotracao'},
-                 'flexocompressao': {'titulo': 'Flexocompressão (Resistência e Estabilidade - Itens 6.3.7 e 6.5.5)', 'chave_mostrar': 'flexocompressao'},
-                 'cisalhamento': {'titulo': 'Cisalhamento Longitudinal em Vigas (Item 6.4.2)', 'chave_mostrar': 'cisalhamento'},
-                 'estabilidade_lateral': {'titulo': 'Estabilidade Lateral das Vigas (Item 6.5.6)', 'chave_mostrar': 'estabilidade_lateral'}
-            } %}
-            {% set alguma_verificacao_mostrada = false %}
 
-            {# Loop pelas verificações na ordem desejada #}
-            {% for chave_interna, info in verificacao_map.items() %}
-                 {% set chave_mostrar = info.chave_mostrar %}
-                 {# Verifica se a verificação foi selecionada pelo usuário #}
-                 {% if resultados.mostrar_verificacoes.get(chave_mostrar) %}
-                     {% set v = resultados.verificacoes.get(chave_interna) %}
-                     {% set calc = resultados.calculos %}
-                     {% set geom = calc.geom %}
-                     {% set esforcos = calc.esforcos_finais %}
-                     {% set mostrar_este_bloco = False %}
-                     {% if v %}
-                         {% set aplicavel_raw = v.get('verificacao_aplicavel', False) %}
-                         {% if chave_interna == 'compressao_simples_resistencia' %}
-                             {% if aplicavel_raw %} {% set mostrar_este_bloco = True %} {% endif %}
-                         {% elif chave_interna == 'compressao_estabilidade' %}
-                              {% set mostrar_este_bloco = False %}
-                         {% elif chave_interna == 'flexao_simples_reta' %}
-                              {% if aplicavel_raw %} {% set mostrar_este_bloco = True %} {% endif %}
-                         {% else %}
-                              {% if aplicavel_raw %} {% set mostrar_este_bloco = True %} {% endif %}
-                         {% endif %}
+        {# --- Seção 5: Verificações Detalhadas (ELU) --- #}
+        <div class="resultado-secao">
+            <h2>5. Verificações Detalhadas (ELU)</h2>
+            {% set alguma_verificacao_elu_renderizada_flag = false %}
+            {% set calc = resultados.calculos %}
+            {% set geom = calc.get('geom', {}) %}
+            {% set esforcos_elu = calc.get('esforcos_finais_elu',{}) %}
+
+            {% set ordem_verificacoes_elu_detalhado = [
+                 ('dimensoes', 'Dimensões Mínimas'),
+                 ('tracao_simples', 'Tração Paralela'),
+                 ('tracao_perpendicular', 'Tração Perpendicular'),
+                 ('compressao_simples_resistencia', 'Compressão Paralela'),
+                 ('compressao_perpendicular', 'Compressão Perpendicular'),
+                 ('flexao_simples_reta', 'Flexão Reta'),
+                 ('flexao_obliqua', 'Flexão Oblíqua'),
+                 ('flexotracao', 'Flexotração'),
+                 ('flexocompressao', 'Flexocompressão'),
+                 ('cisalhamento', 'Cisalhamento'),
+                 ('estabilidade_lateral', 'Estabilidade Lateral')
+            ] %}
+
+            {% for chave_interna_elu, _ in ordem_verificacoes_elu_detalhado %}
+                 {% set v = resultados.verificacoes.get(chave_interna_elu, {}) %}
+                 {% set mostrar_bloco_elu = resultados.mostrar_verificacoes.get(chave_interna_elu, False) and v.get('verificacao_aplicavel', False) %}
+                 
+                 {# Para compressao_simples_resistencia, os detalhes da estabilidade são mostrados dentro dela se selecionada #}
+                 {% if chave_interna_elu == 'compressao_simples_resistencia' and not resultados.mostrar_verificacoes.get('compressao_simples_resistencia') %}
+                    {% set mostrar_bloco_elu = false %}
+                 {% endif %}
+
+
+                 {% if mostrar_bloco_elu %}
+                     {% set alguma_verificacao_elu_renderizada_flag = true %}
+                     {% set titulos_map = {
+                         'dimensoes': 'Dimensões Mínimas (Item 9.2.1)',
+                         'tracao_simples': 'Tração Paralela às Fibras (Item 6.3.2)',
+                         'tracao_perpendicular': 'Tração Perpendicular às Fibras (Item 6.2.3)',
+                         'compressao_simples_resistencia': 'Compressão Paralela às Fibras (Resistência - Item 6.3.3 e Estabilidade - Item 6.5.5)',
+                         'compressao_perpendicular': 'Compressão Perpendicular às Fibras (Item 6.3.3)',
+                         'flexao_simples_reta': 'Flexão Simples Reta (Item 6.3.4)',
+                         'flexao_obliqua': 'Flexão Simples Oblíqua (Item 6.3.5)',
+                         'flexotracao': 'Flexotração (Item 6.3.6)',
+                         'flexocompressao': 'Flexocompressão (Resistência - Item 6.3.7 e Estabilidade - Item 6.5.5)',
+                         'cisalhamento': 'Cisalhamento Longitudinal em Vigas (Item 6.4.2)',
+                         'estabilidade_lateral': 'Estabilidade Lateral das Vigas (Item 6.5.6)'
+                     } %}
+                     {% set titulo_elu = titulos_map.get(chave_interna_elu, chave_interna_elu.replace('_', ' ').capitalize()) %}
+                     {% set houve_erro_elu = v.get('erro') is not none %}
+                     {% set erro_msg_elu = v.get('erro', '') %}
+                     {% set passou_geral_elu = v.get('passou') %}
+                     {% set dispensado_elu = v.get('dispensado', False) %}
+
+                     {% if chave_interna_elu == 'compressao_simples_resistencia' %}
+                        {% set v_est_comp_det_elu = resultados.verificacoes.get('compressao_estabilidade', {}) %}
+                        {% set passou_geral_elu = v.get('passou_geral_compressao_pura', True) %} {# Usa o status combinado #}
+                        {% if v.get('erro') or v_est_comp_det_elu.get('erro') %}{% set houve_erro_elu = True %}{% set erro_msg_elu = (v.get('erro') or "") ~ " " ~ (v_est_comp_det_elu.get('erro') or "") %}{% endif %}
+                     {% elif chave_interna_elu == 'flexocompressao' %}
+                        {% set v_res_fc_det_elu = v.get('resistencia', {}) %}
+                        {% set v_est_fc_det_elu = v.get('estabilidade', {}) %}
+                        {% set passou_geral_elu = v.get('passou') %} {# 'passou' de flexocompressao já é agregado #}
+                        {% if v_res_fc_det_elu.get('erro') or v_est_fc_det_elu.get('erro') %}{% set houve_erro_elu = True %}{% set erro_msg_elu = (v_res_fc_det_elu.get('erro') or "") ~ " " ~ (v_est_fc_det_elu.get('erro') or "") %}{% endif %}
+                     {% elif chave_interna_elu == 'estabilidade_lateral' %}
+                         {% set passou_geral_elu = v.get('dispensado', False) or v.get('passou', False) %}
                      {% endif %}
 
-                     {% if mostrar_este_bloco %}
-                         {% set alguma_verificacao_mostrada = true %}
-                         {% set titulo = info.titulo %}
-                         {% set houve_erro = v.get('erro') is not none %}
-                         {% set erro_msg = v.get('erro', '') %}
-                         {% set passou = None %}
-                         {% if houve_erro %} {% set passou = False %}
-                         {% elif chave_interna == 'compressao_simples_resistencia' %}
-                              {% set v_res = v %}
-                              {% set v_est = resultados.verificacoes.get('compressao_estabilidade', {}) %}
-                              {% set res_passou = v_res.get('passou') %}
-                              {% set est_passou = v_est.get('passou') %}
-                              {% if res_passou is none or est_passou is none %} {% set passou = None %}
-                              {% else %} {% set passou = res_passou and est_passou %}
-                              {% endif %}
-                         {% elif chave_interna == 'flexao_simples_reta' %}
-                              {% set v_x = v.get('x', {'verificacao_aplicavel': False}) %}
-                              {% set v_y = v.get('y', {'verificacao_aplicavel': False}) %}
-                              {% set passou_x = True if not v_x.get('verificacao_aplicavel') else v_x.get('passou') %}
-                              {% set passou_y = True if not v_y.get('verificacao_aplicavel') else v_y.get('passou') %}
-                              {% set passou = passou_x and passou_y %}
-                         {% elif chave_interna == 'flexocompressao' %}
-                             {% set fc_res = v.get('resistencia', {}) %}
-                             {% set fc_est = v.get('estabilidade', {}) %}
-                             {% set res_passou = fc_res.get('passou') %}
-                             {% set est_passou = fc_est.get('passou') %}
-                             {% if res_passou is none or est_passou is none %} {% set passou = None %}
-                             {% else %} {% set passou = res_passou and est_passou %}
-                             {% endif %}
-                         {% elif chave_interna == 'estabilidade_lateral' %}
-                             {% set passou = v.get('dispensado') or v.get('passou') %}
-                         {% else %} {% set passou = v.get('passou') %}
-                         {% endif %}
-
-                         <div class="calculo-detalhe">
-                             <h4>{{ titulo }}</h4>
-
-                             {% if houve_erro %}
-                                 <p class="error-in-verification">Erro na verificação: {{ erro_msg }}</p>
-                             {% else %}
-                                {# --- MEMORIAL DETALHADO --- #}
-
-                                {# DIMENSÕES #}
-                                {% if chave_interna == 'dimensoes' %}
-                                    {% set area_req, esp_req = (5000, 50) %}
-                                    {% set tipo_peca_form = resultados['inputs'].get('tipo_peca_dim', 'principal_isolada') %}
-                                    {% if tipo_peca_form == "secundaria_isolada" %} {% set area_req, esp_req = (1800, 25) %}
-                                    {% elif tipo_peca_form == "principal_multipla" %} {% set area_req, esp_req = (3500, 25) %}
-                                    {% elif tipo_peca_form == "secundaria_multipla" %} {% set area_req, esp_req = (1800, 18) %}
-                                    {% endif %}
-                                    {% set area_fmt = '%.1f'|format(geom.area) %}
-                                    {% set t_min_fmt = '%.1f'|format(resultados.espessura_min_calculada) %}
-                                    <p class="passo-calculo"><span class="label">Área Calculada ($A$):</span> <span class="valor">{{ area_fmt }}</span> <span class="unidade">mm²</span></p>
-                                    <p class="passo-calculo"><span class="label">Espessura Mínima Calculada ($t_{\text{min}}$):</span> <span class="valor">{{ t_min_fmt }}</span> <span class="unidade">mm</span></p>
-                                    <p class="passo-calculo"><span class="label">Área Mínima Requerida ($A_{\text{req}}$ - {{ tipo_peca_form.replace('_',' ').capitalize() }}):</span> <span class="valor">{{ area_req }}</span> <span class="unidade">mm²</span></p>
-                                    <p class="passo-calculo"><span class="label">Espessura Mínima Requerida ($t_{\text{req}}$ - {{ tipo_peca_form.replace('_',' ').capitalize() }}):</span> <span class="valor">{{ esp_req }}</span> <span class="unidade">mm</span></p>
-                                    <div class="resultado-check">
-                                        <span class="status-text">Verificação: $A \ge A_{\text{req}}$ e $t_{\text{min}} \ge t_{\text{req}}$?</span>
-                                        {% if passou %}<span class="atende">APROVADO</span>{% elif passou == False %}<span class="nao-atende">REPROVADO</span>{% else %}<span class="not-applicable">(N/A)</span>{% endif %}
-                                    </div>
-                                {% endif %}
-
-                                {# TRAÇÃO SIMPLES #}
-                                {% if chave_interna == 'tracao_simples' %}
-                                    {% set ft0d_fmt = '%.2f'|format(calc.f_t0d) %}
-                                    {% set area_fmt = '%.1f'|format(geom.area) %}
-                                    {% set nrd_t0_fmt = '%.2f'|format(v.NRd) %}
-                                    {% set nsd_t0_fmt = '%.2f'|format(v.Nsd) %}
-                                    <div class="formula-generica">$$\sigma_{t0,d} = \frac{N_{sd,t0}}{A} \le f_{t0,d}$$</div>
-                                    <p class="passo-calculo"><span class="label">Esforço Solicitante ($N_{sd,t0}$):</span> <span class="valor">{{ nsd_t0_fmt }}</span> <span class="unidade">N</span></p>
-                                    <p class="passo-calculo"><span class="label">Área Líquida ($A$):</span> <span class="valor">{{ area_fmt }}</span> <span class="unidade">mm²</span></p>
-                                    <p class="passo-calculo"><span class="label">Resistência de Cálculo ($f_{t0,d}$):</span> <span class="valor">{{ ft0d_fmt }}</span> <span class="unidade">MPa</span></p>
-                                    <div class="formula-generica">$$N_{Rd,t0} = f_{t0,d} \times A$$</div>
-                                    <p class="passo-calculo"><span class="label">Força Resistente ($N_{Rd,t0}$):</span> <span class="valor">{{ nrd_t0_fmt }}</span> <span class="unidade">N</span> <span class="formula-inline">$ = {{ ft0d_fmt }} \times {{ area_fmt }} $</span></p>
-                                    {% if v.get('is_combined_case') %}<p class="warning-info">(Aviso: Caso combinado de Flexotração também é aplicável e pode governar o dimensionamento.)</p>{% endif %}
-                                    <div class="resultado-check">
-                                        <span class="status-text">Verificação: $N_{sd,t0} \le N_{Rd,t0}$ ?</span>
-                                        {% if passou %}<span class="atende">APROVADO</span>{% elif passou == False %}<span class="nao-atende">REPROVADO</span>{% else %}<span class="not-applicable">(N/A)</span>{% endif %}
-                                        <br> <span style="font-size: 0.9em; font-weight: normal;">(${{ nsd_t0_fmt }} \le {{ nrd_t0_fmt }}$ N)</span>
-                                    </div>
-                                {% endif %}
-
-                                {# TRAÇÃO PERPENDICULAR #}
-                                {% if chave_interna == 'tracao_perpendicular' %}
-                                     {% set ft90d_fmt = '%.2f'|format(calc.f_t90d) %}
-                                     {% set area_fmt = '%.1f'|format(geom.area) %}
-                                     {% set nrd_t90_fmt = '%.2f'|format(v.NRd) %}
-                                     {% set nsd_t90_fmt = '%.2f'|format(v.Nsd) %}
-                                     <div class="formula-generica">$$\sigma_{t90,d} = \frac{N_{sd,t90}}{A} \le f_{t90,d}$$</div>
-                                     <p class="passo-calculo"><span class="label">Esforço Solicitante ($N_{sd,t90}$):</span> <span class="valor">{{ nsd_t90_fmt }}</span> <span class="unidade">N</span></p>
-                                     <p class="passo-calculo"><span class="label">Área ($A$):</span> <span class="valor">{{ area_fmt }}</span> <span class="unidade">mm²</span></p>
-                                     <p class="passo-calculo"><span class="label">Resistência de Cálculo ($f_{t90,d}$):</span> <span class="valor">{{ ft90d_fmt }}</span> <span class="unidade">MPa</span> <small>(Considera $\min(k_{\text{mod}}f_{t90k}/\gamma_t, 0.06 f_{t0d})$)</small></p>
-                                     <div class="formula-generica">$$N_{Rd,t90} = f_{t90,d} \times A$$</div>
-                                     <p class="passo-calculo"><span class="label">Força Resistente ($N_{Rd,t90}$):</span> <span class="valor">{{ nrd_t90_fmt }}</span> <span class="unidade">N</span> <span class="formula-inline">$ = {{ ft90d_fmt }} \times {{ area_fmt }} $</span></p>
-                                     <p class="details-summary" style="font-style: italic; color: #555;">(Nota: NBR 7190 Item 6.2.3 recomenda evitar depender desta resistência)</p>
-                                     <div class="resultado-check">
-                                         <span class="status-text">Verificação: $N_{sd,t90} \le N_{Rd,t90}$ ?</span>
-                                         {% if passou %}<span class="atende">APROVADO</span>{% elif passou == False %}<span class="nao-atende">REPROVADO</span>{% else %}<span class="not-applicable">(N/A)</span>{% endif %}
-                                         <br> <span style="font-size: 0.9em; font-weight: normal;">(${{ nsd_t90_fmt }} \le {{ nrd_t90_fmt }}$ N)</span>
-                                     </div>
-                                {% endif %}
-
-                                {# COMPRESSÃO PARALELA (RESIST + ESTAB) #}
-                                {% if chave_interna == 'compressao_simples_resistencia' %}
-                                    {% set v_est = resultados.verificacoes.get('compressao_estabilidade', {}) %}
-                                    {% set nsd_c0_fmt = '%.2f'|format(v.Nsd) %}
-                                    {% set area_fmt = '%.1f'|format(geom.area) %}
-                                    {% set fc0d_fmt = '%.2f'|format(calc.f_c0d) %}
-                                    {% set nrd_res_fmt = '%.2f'|format(v.NRd) %}
-                                    {% set fc0k_fmt = '%.2f'|format(calc.f_c0k) %}
-                                    {% set e005_fmt = '%.0f'|format(calc.E_005) %}
-                                    {% set kex_fmt = '%.2f'|format(resultados.Ke_x) %}
-                                    {% set key_fmt = '%.2f'|format(resultados.Ke_y) %}
-                                    {% set l_mm_fmt = '%.0f'|format(resultados.comprimento_mm) %}
-                                    {% set l0x_fmt = '%.0f'|format(resultados.Ke_x * resultados.comprimento_mm) %}
-                                    {% set l0y_fmt = '%.0f'|format(resultados.Ke_y * resultados.comprimento_mm) %}
-                                    {% set ix_fmt = '%.2f'|format(geom.i_x) %}
-                                    {% set iy_fmt = '%.2f'|format(geom.i_y) %}
-                                    {% set lamx_fmt = '%.2f'|format(v_est.get('lambda_x', 0)) %}
-                                    {% set lamy_fmt = '%.2f'|format(v_est.get('lambda_y', 0)) %}
-                                    {% set lam_relx_fmt = '%.3f'|format(v_est.get('lambda_rel_x', 0)) %}
-                                    {% set lam_rely_fmt = '%.3f'|format(v_est.get('lambda_rel_y', 0)) %}
-                                    {% set beta_c_fmt = '%.1f'|format(calc.beta_c) %}
-                                    {% set kcx_fmt = '%.3f'|format(v_est.get('kc_x', 1.0)) %}
-                                    {% set kcy_fmt = '%.3f'|format(v_est.get('kc_y', 1.0)) %}
-                                    {% set kcmin_fmt = '%.3f'|format(v_est.get('kc_min', 1.0)) %}
-                                    {% set nrd_est_fmt = '%.2f'|format(v_est.get('NRd', 0)) %}
-                                    <p class="passo-calculo"><span class="label">Esforço Solicitante ($N_{sd,c0}$):</span> <span class="valor">{{ nsd_c0_fmt }}</span> <span class="unidade">N</span></p>
-                                    <h5>Resistência da Seção (Item 6.3.3)</h5>
-                                    <div class="formula-generica">$$\sigma_{c0,d} = \frac{N_{sd,c0}}{A} \le f_{c0,d}$$</div>
-                                    <p class="passo-calculo"><span class="label">Área Líquida ($A$):</span> <span class="valor">{{ area_fmt }}</span> <span class="unidade">mm²</span></p>
-                                    <p class="passo-calculo"><span class="label">Resistência de Cálculo ($f_{c0,d}$):</span> <span class="valor">{{ fc0d_fmt }}</span> <span class="unidade">MPa</span></p>
-                                    <div class="formula-generica">$$N_{Rd,c0,\text{res}} = f_{c0,d} \times A$$</div>
-                                    <p class="passo-calculo"><span class="label">Força Resistente (Resistência) ($N_{Rd,c0,\text{res}}$):</span> <span class="valor">{{ nrd_res_fmt }}</span> <span class="unidade">N</span> <span class="formula-inline">$ = {{ fc0d_fmt }} \times {{ area_fmt }} $</span></p>
-                                    <p class="resultado-check" style="border:none; text-align:left; padding:0; font-size: 1em;">
-                                        <span class="status-text">Verificação Resistência: $N_{sd,c0} \le N_{Rd,c0,\text{res}}$?</span>
-                                        {% if v.get('passou') %} <span class="atende">(OK)</span>
-                                        {% elif v.get('passou') == False %} <span class="nao-atende">(FALHA)</span>
-                                        {% else %} <span class="not-applicable">(N/A)</span> {% endif %}
-                                        <span style="font-size: 0.9em; font-weight: normal;"> (${{ nsd_c0_fmt }} \le {{ nrd_res_fmt }}$ N)</span>
-                                    </p>
-                                    <h5 style="margin-top: 20px;">Estabilidade (Item 6.5.5)</h5>
-                                    {# Checa a fórmula complexa novamente - parece ok #}
-                                    <div class="formula-generica">$$\lambda_i = \frac{L_{0i}}{i_i} \quad ; \quad \lambda_{\text{rel},i} = \frac{\lambda_i}{\pi} \sqrt{\frac{f_{c0,k}}{E_{0,05}}} \quad ; \quad k_{c,i} = \frac{1}{k_i + \sqrt{k_i^2 - \lambda_{\text{rel},i}^2}}$$ $$\text{onde } k_i = 0.5 \left( 1 + \beta_c(\lambda_{\text{rel},i} - 0.3) + \lambda_{\text{rel},i}^2 \right)$$</div>
-                                    <p class="passo-calculo"><span class="label">Comprimento de Flambagem ($L_{0x}$):</span> <span class="valor">{{ l0x_fmt }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = {{ kex_fmt }} \times {{ l_mm_fmt }} $</span></p>
-                                    <p class="passo-calculo"><span class="label">Comprimento de Flambagem ($L_{0y}$):</span> <span class="valor">{{ l0y_fmt }}</span> <span class="unidade">mm</span> <span class="formula-inline">$ = {{ key_fmt }} \times {{ l_mm_fmt }} $</span></p>
-                                    <p class="passo-calculo"><span class="label">Raio de Giração ($i_x, i_y$):</span> <span class="valor">{{ ix_fmt }}, {{ iy_fmt }}</span> <span class="unidade">mm</span></p>
-                                    <p class="passo-calculo"><span class="label">Índice de Esbeltez ($\lambda_x, \lambda_y$):</span> <span class="valor">{{ lamx_fmt }}, {{ lamy_fmt }}</span> <span class="formula-inline">$ \lambda_x = \frac{ {{ l0x_fmt }} }{ {{ ix_fmt }} }; \lambda_y = \frac{ {{ l0y_fmt }} }{ {{ iy_fmt }} } $</span></p>
-                                    <p class="passo-calculo"><span class="label">Resistência Característica ($f_{c0,k}$):</span> <span class="valor">{{ fc0k_fmt }}</span> <span class="unidade">MPa</span></p>
-                                    <p class="passo-calculo"><span class="label">Módulo Elasticidade Característico ($E_{0,05}$):</span> <span class="valor">{{ e005_fmt }}</span> <span class="unidade">MPa</span></p>
-                                    <p class="passo-calculo"><span class="label">Esbeltez Relativa ($\lambda_{\text{rel},x}, \lambda_{\text{rel},y}$):</span> <span class="valor">{{ lam_relx_fmt }}, {{ lam_rely_fmt }}</span> <span class="formula-inline">$ \lambda_{\text{rel}} = \frac{\lambda}{\pi} \sqrt{ \frac{f_{c0,k}}{E_{0,05}} } $</span></p>
-                                    <p class="passo-calculo"><span class="label">Fator $\beta_c$:</span> <span class="valor">{{ beta_c_fmt }}</span></p>
-                                    <p class="passo-calculo"><span class="label">Coeficiente de Redução ($k_{c,x}, k_{c,y}$):</span> <span class="valor">{{ kcx_fmt }}, {{ kcy_fmt }}</span></p>
-                                    <p class="passo-calculo"><span class="label">Coeficiente de Redução Mínimo ($k_{c,\text{min}}$):</span> <span class="valor">{{ kcmin_fmt }}</span></p>
-                                    <div class="formula-generica">$$N_{Rd,c0,\text{est}} = k_{c,\text{min}} \times f_{c0,d} \times A \quad \text{e} \quad \lambda_{\text{max}} \le 140$$</div>
-                                    <p class="passo-calculo"><span class="label">Força Resistente (Estabilidade) ($N_{Rd,c0,\text{est}}$):</span> <span class="valor">{{ nrd_est_fmt }}</span> <span class="unidade">N</span> <span class="formula-inline">$ = {{ kcmin_fmt }} \times {{ fc0d_fmt }} \times {{ area_fmt }} $</span></p>
-                                    <p class="resultado-check" style="border:none; text-align:left; padding:0; font-size: 1em;">
-                                        <span class="status-text">Verificação Limite Esbeltez: $\lambda_{\text{max}} = {{ '%.2f'|format(v_est.get('lambda_max', 999)) }} \le 140$?</span>
-                                        {% if v_est.get('esbeltez_ok') %} <span class="atende">(OK)</span>
-                                        {% elif v_est.get('esbeltez_ok') == False %} <span class="nao-atende">(FALHA)</span>
-                                        {% else %} <span class="not-applicable">(N/A)</span> {% endif %}
-                                    </p>
-                                    {% if v_est.get('esbeltez_ok') %}
-                                        <p class="resultado-check" style="border:none; text-align:left; padding:0; font-size: 1em;">
-                                            <span class="status-text">Verificação Força (Estabilidade): $N_{sd,c0} \le N_{Rd,c0,\text{est}}$?</span>
-                                            {% if v_est.get('passou_est_apenas') %} <span class="atende">(OK)</span>
-                                            {% elif v_est.get('passou_est_apenas') == False %} <span class="nao-atende">(FALHA)</span>
-                                            {% else %} <span class="not-applicable">(N/A)</span> {% endif %}
-                                            <span style="font-size: 0.9em; font-weight: normal;"> (${{ nsd_c0_fmt }} \le {{ nrd_est_fmt }}$ N)</span>
-                                        </p>
-                                    {% endif %}
-                                     {% if v.get('is_combined_case') %}<p class="warning-info">(Aviso: Caso combinado de Flexocompressão também é aplicável e pode governar o dimensionamento.)</p>{% endif %}
-                                    <div class="resultado-check">
-                                        <span class="status-text">Status Geral Compressão Paralela:</span>
-                                        {% if passou %}<span class="atende">APROVADO</span>
-                                        {% elif passou == False %}<span class="nao-atende">REPROVADO</span>
-                                        {% else %}<span class="not-applicable">(N/A)</span> {% endif %}
-                                    </div>
-                                {% endif %}
-
-                            {# COMPRESSÃO PERPENDICULAR #}
-                            {% if chave_interna == 'compressao_perpendicular' %}
-                                 {% set fc90d_fmt = '%.2f'|format(calc.f_c90d) %}
-                                 {% set a_ef_fmt = '%.1f'|format(v.get('Area_apoio_usada', geom.area)) %}
-                                 {% set nrd_c90_fmt = '%.2f'|format(v.NRd) %}
-                                 {% set nsd_c90_fmt = '%.2f'|format(v.Nsd) %}
-                                 <div class="formula-generica">$$\sigma_{c90,d} = \frac{N_{sd,c90}}{A_{\text{ef}}} \le f_{c90,d}$$</div>
-                                 <p class="passo-calculo"><span class="label">Esforço Solicitante ($N_{sd,c90}$):</span> <span class="valor">{{ nsd_c90_fmt }}</span> <span class="unidade">N</span></p>
-                                 <p class="passo-calculo"><span class="label">Área Efetiva de Apoio ($A_{\text{ef}}$):</span> <span class="valor">{{ a_ef_fmt }}</span> <span class="unidade">mm²</span> <small>(ATENÇÃO: Usando $A=b \times h$ por padrão. Ajustar se necessário.)</small></p>
-                                 <p class="passo-calculo"><span class="label">Resistência de Cálculo ($f_{c90,d}$):</span> <span class="valor">{{ fc90d_fmt }}</span> <span class="unidade">MPa</span></p>
-                                 <div class="formula-generica">$$N_{Rd,c90} = f_{c90,d} \times A_{\text{ef}}$$</div>
-                                 <p class="passo-calculo"><span class="label">Força Resistente ($N_{Rd,c90}$):</span> <span class="valor">{{ nrd_c90_fmt }}</span> <span class="unidade">N</span> <span class="formula-inline">$ = {{ fc90d_fmt }} \times {{ a_ef_fmt }} $</span></p>
-                                  <div class="resultado-check">
-                                        <span class="status-text">Verificação: $N_{sd,c90} \le N_{Rd,c90}$ ?</span>
-                                        {% if passou %}<span class="atende">APROVADO</span>{% elif passou == False %}<span class="nao-atende">REPROVADO</span>{% else %}<span class="not-applicable">(N/A)</span>{% endif %}
-                                        <br> <span style="font-size: 0.9em; font-weight: normal;">(${{ nsd_c90_fmt }} \le {{ nrd_c90_fmt }}$ N)</span>
-                                  </div>
+                     <div class="calculo-detalhe">
+                         <h4>{{ titulo_elu }}</h4>
+                         {% if houve_erro_elu %}
+                             <p class="error-in-verification">Erro na verificação: {{ erro_msg_elu.strip() }}</p>
+                         {% else %}
+                            {# DIMENSÕES MÍNIMAS #}
+                            {% if chave_interna_elu == 'dimensoes' %}
+                                <p class="passo-calculo"><span class="label">Área da Seção ($A_{ef}$):</span> <span class="valor">{{ '%.1f'|format(calc.geom.get('area',0.0)) }}</span> <span class="unidade">mm²</span></p>
+                                <p class="passo-calculo"><span class="label">Área Mínima Requerida ($A_{min}$):</span> <span class="valor">{{ '%.0f'|format(v.get('area_req',0.0)) }}</span> <span class="unidade">mm²</span> <small>(Para {{ resultados.inputs.get('tipo_peca_dim','principal_isolada').replace('_',' ') }})</small></p>
+                                <p class="passo-calculo"><span class="label">Menor Dimensão da Seção ($e_{ef}$):</span> <span class="valor">{{ '%.1f'|format(resultados.get('espessura_min_calculada',0.0)) }}</span> <span class="unidade">mm</span></p>
+                                <p class="passo-calculo"><span class="label">Menor Dimensão Requerida ($e_{min}$):</span> <span class="valor">{{ '%.0f'|format(v.get('espessura_req',0.0)) }}</span> <span class="unidade">mm</span></p>
+                                <div class="formula-generica">Verificar: $A \ge A_{\text{req}}$ e $e_{ef} \ge e_{\text{min}}$</div>
                             {% endif %}
 
-                            {# FLEXÃO SIMPLES RETA #}
-                            {% if chave_interna == 'flexao_simples_reta' %}
-                                {% set v_x = v.get('x', {'verificacao_aplicavel': False}) %}
-                                {% set v_y = v.get('y', {'verificacao_aplicavel': False}) %}
-                                {% set fmd_fmt = '%.2f'|format(calc.f_md) %}
-                                {% if v_x and v_x.get('verificacao_aplicavel') %}
-                                     {% set msdx_fmt = '%.2f'|format(v_x.Msd) %}
-                                     {% set wx_fmt = '%.0f'|format(geom.W_x) %}
-                                     {% set mrdx_fmt = '%.2f'|format(v_x.MRd) %}
-                                     <h5>Flexão em torno do Eixo X</h5>
-                                     <div class="formula-generica">$$\sigma_{m,x,d} = \frac{|M_{sd,x}|}{W_x} \le f_{m,d}$$</div>
-                                     <p class="passo-calculo"><span class="label">Momento Solicitante ($M_{sd,x}$):</span> <span class="valor">{{ msdx_fmt }}</span> <span class="unidade">N.mm</span></p>
-                                     <p class="passo-calculo"><span class="label">Módulo Resistente ($W_x$):</span> <span class="valor">{{ wx_fmt }}</span> <span class="unidade">mm³</span></p>
-                                     <p class="passo-calculo"><span class="label">Resistência de Cálculo ($f_{m,d}$):</span> <span class="valor">{{ fmd_fmt }}</span> <span class="unidade">MPa</span></p>
-                                     <div class="formula-generica">$$M_{Rd,x} = f_{m,d} \times W_x$$</div>
-                                     <p class="passo-calculo"><span class="label">Momento Resistente ($M_{Rd,x}$):</span> <span class="valor">{{ mrdx_fmt }}</span> <span class="unidade">N.mm</span> <span class="formula-inline">$ = {{ fmd_fmt }} \times {{ wx_fmt }} $</span></p>
-                                      <p class="resultado-check" style="border:none; text-align:left; padding:0; font-size: 1em;">
-                                         <span class="status-text">Verificação Eixo X: $|M_{sd,x}| \le M_{Rd,x}$?</span>
-                                         {% if v_x.passou %} <span class="atende">(OK)</span>
-                                         {% elif v_x.get('passou') == False %} <span class="nao-atende">(FALHA)</span>
-                                         {% else %} <span class="not-applicable">(N/A)</span> {% endif %}
-                                         <span style="font-size: 0.9em; font-weight: normal;"> ($|{{ msdx_fmt }}| \le {{ mrdx_fmt }}$ N.mm)</span>
-                                     </p>
+                            {# TRAÇÃO SIMPLES / PERPENDICULAR / COMPRESSÃO PERP. / CISALHAMENTO #}
+                            {% if chave_interna_elu in ['tracao_simples', 'tracao_perpendicular', 'compressao_perpendicular', 'cisalhamento'] %}
+                                {% set Sd_formatado = v.get('Nsd_formatado', v.get('Vsd_formatado', 'N/A')) %}
+                                {% set Rd_formatado = v.get('NRd_formatado', v.get('VRd_formatado', 'N/A')) %}
+                                {% set Sd_val_elu = v.get('Nsd', v.get('Vsd', 0.0)) %}
+                                {% set Rd_val_elu = v.get('NRd', v.get('VRd', 0.0)) %}
+                                {% set fd_val_elu = 0.0 %}; {% set fd_label_elu = '' %}
+                                {% set formula_Rd_elu = '' %}
+                                {% if chave_interna_elu == 'tracao_simples' %}
+                                    {% set fd_val_elu = calc.get('f_t0d',0.0) %}{% set fd_label_elu = 'f_{t0,d}' %}
+                                    {% set formula_Rd_elu = 'N_{Rd,t0} = f_{t0,d} \times A' %}
+                                    <div class="formula-generica"><span class="math-block">$$\sigma_{t0,d} = \frac{N_{sd,t0}}{A} \le f_{t0,d}$$</span></div>
+                                {% elif chave_interna_elu == 'tracao_perpendicular' %}
+                                    {% set fd_val_elu = calc.get('f_t90d',0.0) %}{% set fd_label_elu = 'f_{t90,d}' %}
+                                    {% set formula_Rd_elu = 'N_{Rd,t90} = f_{t90,d} \times A_{ef}' %}
+                                     <div class="formula-generica"><span class="math-block">$$\sigma_{t90,d} = \frac{N_{sd,t90}}{A_{ef}} \le f_{t90,d}$$</span></div>
+                                {% elif chave_interna_elu == 'compressao_perpendicular' %}
+                                    {% set fd_val_elu = calc.get('f_c90d',0.0) %}{% set fd_label_elu = 'f_{c90,d}' %}
+                                    {% set formula_Rd_elu = 'N_{Rd,c90} = f_{c90,d} \times A_{ef}' %}
+                                     <div class="formula-generica"><span class="math-block">$$\sigma_{c90,d} = \frac{N_{sd,c90}}{A_{ef}} \le f_{c90,d}$$</span></div>
+                                {% elif chave_interna_elu == 'cisalhamento' %}
+                                    {% set fd_val_elu = calc.get('f_vd',0.0) %}{% set fd_label_elu = 'f_{v,d}' %}
+                                    {% set formula_Rd_elu = 'V_{Rd} = (f_{v,d} \times A) / 1.5' %}
+                                    <div class="formula-generica"><span class="math-block">$$\tau_{d} = 1.5 \frac{|V_{sd}|}{A} \le f_{vd}$$</span></div>
                                 {% endif %}
-                                {% if v_y and v_y.get('verificacao_aplicavel') %}
-                                     {% set msdy_fmt = '%.2f'|format(v_y.Msd) %}
-                                     {% set wy_fmt = '%.0f'|format(geom.W_y) %}
-                                     {% set mrdy_fmt = '%.2f'|format(v_y.MRd) %}
-                                     <h5 style="margin-top: 18px;">Flexão em torno do Eixo Y</h5>
-                                     <div class="formula-generica">$$\sigma_{m,y,d} = \frac{|M_{sd,y}|}{W_y} \le f_{m,d}$$</div>
-                                     <p class="passo-calculo"><span class="label">Momento Solicitante ($M_{sd,y}$):</span> <span class="valor">{{ msdy_fmt }}</span> <span class="unidade">N.mm</span></p>
-                                     <p class="passo-calculo"><span class="label">Módulo Resistente ($W_y$):</span> <span class="valor">{{ wy_fmt }}</span> <span class="unidade">mm³</span></p>
-                                     <p class="passo-calculo"><span class="label">Resistência de Cálculo ($f_{m,d}$):</span> <span class="valor">{{ fmd_fmt }}</span> <span class="unidade">MPa</span></p>
-                                     <div class="formula-generica">$$M_{Rd,y} = f_{m,d} \times W_y$$</div>
-                                     <p class="passo-calculo"><span class="label">Momento Resistente ($M_{Rd,y}$):</span> <span class="valor">{{ mrdy_fmt }}</span> <span class="unidade">N.mm</span> <span class="formula-inline">$ = {{ fmd_fmt }} \times {{ wy_fmt }} $</span></p>
-                                      <p class="resultado-check" style="border:none; text-align:left; padding:0; font-size: 1em;">
-                                         <span class="status-text">Verificação Eixo Y: $|M_{sd,y}| \le M_{Rd,y}$?</span>
-                                         {% if v_y.passou %} <span class="atende">(OK)</span>
-                                         {% elif v_y.get('passou') == False %} <span class="nao-atende">(FALHA)</span>
-                                         {% else %} <span class="not-applicable">(N/A)</span> {% endif %}
-                                         <span style="font-size: 0.9em; font-weight: normal;"> ($|{{ msdy_fmt }}| \le {{ mrdy_fmt }}$ N.mm)</span>
-                                     </p>
+                                <p class="passo-calculo"><span class="label">Esforço Solicitante ($S_d$):</span> <span class="valor">{{ Sd_formatado }}</span> <span class="unidade">N</span></p>
+                                <p class="passo-calculo"><span class="label">Resistência de Cálculo (${{fd_label_elu}}$):</span> <span class="valor">{{ '%.2f'|format(fd_val_elu) }}</span> <span class="unidade">MPa</span></p>
+                                <p class="passo-calculo"><span class="label">Área (ou Área Efetiva $A_{ef}$):</span> <span class="valor">{{ '%.1f'|format(v.get('Area_apoio_usada', geom.get('area',0.0))) }}</span> <span class="unidade">mm²</span> {% if chave_interna_elu == 'compressao_perpendicular' %}<small>(Usando $A=b \times h$ por padrão)</small>{% endif %}</p>
+                                <p class="passo-calculo"><span class="label">Força Resistente de Cálculo ($R_d$):</span> <span class="valor">{{ Rd_formatado }}</span> <span class="unidade">N</span> <span class="formula-inline">$ ( {{formula_Rd_elu}} ) $</span></p>
+                                {% if v.get('is_combined_case') and ( (chave_interna_elu == 'tracao_simples' and resultados.mostrar_verificacoes.get('flexotracao')) ) %}
+                                <p class="warning-info">(Nota: Flexotração também aplicável/selecionada. Verifique a seção correspondente para o resultado combinado.)</p>
                                 {% endif %}
-                                {% if v.get('is_combined_case') %}<p class="warning-info">(Aviso: Caso combinado (Flexotração ou Flexocompressão) também é aplicável e pode governar o dimensionamento.)</p>{% endif %}
-                                <div class="resultado-check">
-                                    <span class="status-text">Status Geral Flexão Reta:</span>
-                                    {% if passou %}<span class="atende">APROVADO</span>{% elif passou == False %}<span class="nao-atende">REPROVADO</span>{% else %}<span class="not-applicable">(N/A)</span>{% endif %}
-                                </div>
                             {% endif %}
-
-                            {# FLEXÃO OBLÍQUA #}
-                            {% if chave_interna == 'flexao_obliqua' %}
-                                 {% set msdx_abs_fmt = '%.2f'|format(v.Msdx|abs) %}
-                                 {% set msdy_abs_fmt = '%.2f'|format(v.Msdy|abs) %}
-                                 {% set mrdx_fmt = '%.2f'|format(calc.f_md * geom.W_x) %}
-                                 {% set mrdy_fmt = '%.2f'|format(calc.f_md * geom.W_y) %}
-                                 {% set km_fmt = '%.1f'|format(v.get('k_M_usado', calc.k_M)) %}
-                                 <div class="formula-generica">$$ \frac{|M_{sd,x}|}{M_{Rd,x}} + k_M \frac{|M_{sd,y}|}{M_{Rd,y}} \le 1 \quad \text{e} \quad k_M \frac{|M_{sd,x}|}{M_{Rd,x}} + \frac{|M_{sd,y}|}{M_{Rd,y}} \le 1 $$</div>
-                                 <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,x}|$):</span> <span class="valor">{{ msdx_abs_fmt }}</span> <span class="unidade">N.mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,y}|$):</span> <span class="valor">{{ msdy_abs_fmt }}</span> <span class="unidade">N.mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Momento Resistente ($M_{Rd,x}$):</span> <span class="valor">{{ mrdx_fmt }}</span> <span class="unidade">N.mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Momento Resistente ($M_{Rd,y}$):</span> <span class="valor">{{ mrdy_fmt }}</span> <span class="unidade">N.mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Coeficiente ($k_M$):</span> <span class="valor">{{ km_fmt }}</span></p>
-                                 {% set termo_Mx = (v.Msdx|abs / (calc.f_md * geom.W_x)) if abs(calc.f_md * geom.W_x) > TOL else float('inf') %}
-                                 {% set termo_My = (v.Msdy|abs / (calc.f_md * geom.W_y)) if abs(calc.f_md * geom.W_y) > TOL else float('inf') %}
-                                 <p class="passo-calculo"><span class="label">Termo X ($|M_{sd,x}|/M_{Rd,x}$):</span> <span class="valor">{{ '%.3f'|format(termo_Mx) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Termo Y ($|M_{sd,y}|/M_{Rd,y}$):</span> <span class="valor">{{ '%.3f'|format(termo_My) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Ratio 1 ($X + k_M Y$):</span> <span class="valor">{{ '%.3f'|format(termo_Mx + v.get('k_M_usado', calc.k_M) * termo_My) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Ratio 2 ($k_M X + Y$):</span> <span class="valor">{{ '%.3f'|format(v.get('k_M_usado', calc.k_M) * termo_Mx + termo_My) }}</span></p>
-                                  <div class="resultado-check">
-                                     <span class="status-text">Verificação: Max(Ratio1, Ratio2) = {{ '%.3f'|format(v.ratio) }} $\le$ 1.0?</span>
-                                     {% if passou %}<span class="atende">APROVADO</span>{% elif passou == False %}<span class="nao-atende">REPROVADO</span>{% else %}<span class="not-applicable">(N/A)</span>{% endif %}
-                                  </div>
-                            {% endif %}
-
-                             {# FLEXOTRAÇÃO #}
-                             {% if chave_interna == 'flexotracao' %}
-                                 {% set nsd_t0_fmt = '%.2f'|format(v.Nsd) %}
-                                 {% set msdx_abs_fmt = '%.2f'|format(v.Msdx|abs) %}
-                                 {% set msdy_abs_fmt = '%.2f'|format(v.Msdy|abs) %}
-                                 {% set nrd_t0_fmt = '%.2f'|format(calc.f_t0d * geom.area) %}
-                                 {% set mrdx_fmt = '%.2f'|format(calc.f_md * geom.W_x) %}
-                                 {% set mrdy_fmt = '%.2f'|format(calc.f_md * geom.W_y) %}
-                                 {% set km_fmt = '%.1f'|format(v.get('k_M_usado', calc.k_M)) %}
-                                 <div class="formula-generica">$$\frac{N_{sd,t0}}{N_{Rd,t0}} + \frac{|M_{sd,x}|}{M_{Rd,x}} + k_M \frac{|M_{sd,y}|}{M_{Rd,y}} \le 1 \quad \text{e} \quad \frac{N_{sd,t0}}{N_{Rd,t0}} + k_M \frac{|M_{sd,x}|}{M_{Rd,x}} + \frac{|M_{sd,y}|}{M_{Rd,y}} \le 1$$</div>
-                                 <p class="passo-calculo"><span class="label">Força Normal Solicitante ($N_{sd,t0}$):</span> <span class="valor">{{ nsd_t0_fmt }}</span> <span class="unidade">N</span></p>
-                                 <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,x}|$):</span> <span class="valor">{{ msdx_abs_fmt }}</span> <span class="unidade">N.mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,y}|$):</span> <span class="valor">{{ msdy_abs_fmt }}</span> <span class="unidade">N.mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Força Resistente ($N_{Rd,t0}$):</span> <span class="valor">{{ nrd_t0_fmt }}</span> <span class="unidade">N</span></p>
-                                 <p class="passo-calculo"><span class="label">Momento Resistente ($M_{Rd,x}$):</span> <span class="valor">{{ mrdx_fmt }}</span> <span class="unidade">N.mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Momento Resistente ($M_{Rd,y}$):</span> <span class="valor">{{ mrdy_fmt }}</span> <span class="unidade">N.mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Coeficiente ($k_M$):</span> <span class="valor">{{ km_fmt }}</span></p>
-                                 {% set termo_N = (v.Nsd / (calc.f_t0d * geom.area)) if abs(calc.f_t0d * geom.area) > TOL else float('inf') %}
-                                 {% set termo_Mx = (v.Msdx|abs / (calc.f_md * geom.W_x)) if abs(calc.f_md * geom.W_x) > TOL else float('inf') %}
-                                 {% set termo_My = (v.Msdy|abs / (calc.f_md * geom.W_y)) if abs(calc.f_md * geom.W_y) > TOL else float('inf') %}
-                                 <p class="passo-calculo"><span class="label">Termo Tração ($N_{sd}/N_{Rd}$):</span> <span class="valor">{{ '%.3f'|format(termo_N) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Termo Flexão X ($|M_{sd,x}|/M_{Rd,x}$):</span> <span class="valor">{{ '%.3f'|format(termo_Mx) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Termo Flexão Y ($|M_{sd,y}|/M_{Rd,y}$):</span> <span class="valor">{{ '%.3f'|format(termo_My) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Ratio 1 ($N + M_x + k_M M_y$):</span> <span class="valor">{{ '%.3f'|format(termo_N + termo_Mx + v.get('k_M_usado', calc.k_M) * termo_My) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Ratio 2 ($N + k_M M_x + M_y$):</span> <span class="valor">{{ '%.3f'|format(termo_N + v.get('k_M_usado', calc.k_M) * termo_Mx + termo_My) }}</span></p>
-                                 <div class="resultado-check">
-                                      <span class="status-text">Verificação: Max(Ratio1, Ratio2) = {{ '%.3f'|format(v.ratio) }} $\le$ 1.0?</span>
-                                     {% if passou %}<span class="atende">APROVADO</span>{% elif passou == False %}<span class="nao-atende">REPROVADO</span>{% else %}<span class="not-applicable">(N/A)</span>{% endif %}
-                                 </div>
-                             {% endif %}
-
-                             {# FLEXOCOMPRESSÃO #}
-                             {% if chave_interna == 'flexocompressao' %}
-                                 {% set fc_res = v.get('resistencia', {}) %}
-                                 {% set fc_est = v.get('estabilidade', {}) %}
-                                 {% set Nsd_c = esforcos.get('Nsd_c0', 0) %}
-                                 {% set Msdx_c = esforcos.get('Msdx', 0) %}
-                                 {% set Msdy_c = esforcos.get('Msdy', 0) %}
-                                 {% set area_fmt = '%.1f'|format(geom.area) %}
-                                 {% set wx_fmt = '%.0f'|format(geom.W_x) %}
-                                 {% set wy_fmt = '%.0f'|format(geom.W_y) %}
-                                 {% set fc0d_fmt = '%.2f'|format(calc.f_c0d) %}
-                                 {% set fmd_fmt = '%.2f'|format(calc.f_md) %}
-                                 {% set km_fmt = '%.1f'|format(fc_res.get('k_M_usado', calc.k_M)) %}
-
-                                 <h5>Verificação da Resistência (Item 6.3.7)</h5>
-                                 <div class="formula-generica">$$\left( \frac{\sigma_{Nc0,d}}{f_{c0,d}} \right)^2 + \frac{\sigma_{Mx,d}}{f_{m,d}} + k_M \frac{\sigma_{My,d}}{f_{m,d}} \le 1 \quad \text{e} \quad \left( \frac{\sigma_{Nc0,d}}{f_{c0,d}} \right)^2 + k_M \frac{\sigma_{Mx,d}}{f_{m,d}} + \frac{\sigma_{My,d}}{f_{m,d}} \le 1$$</div>
-                                 <p class="passo-calculo"><span class="label">Força Normal Solicitante ($N_{sd,c0}$):</span> <span class="valor">{{ '%.2f'|format(Nsd_c) }}</span> <span class="unidade">N</span></p>
-                                 <p class="passo-calculo"><span class="label">Momento Solicitante ($M_{sd,x}$):</span> <span class="valor">{{ '%.2f'|format(Msdx_c) }}</span> <span class="unidade">N.mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Momento Solicitante ($M_{sd,y}$):</span> <span class="valor">{{ '%.2f'|format(Msdy_c) }}</span> <span class="unidade">N.mm</span></p>
-                                 {% set sigma_Ncd = (Nsd_c|abs / geom.area) if geom.area > TOL else 0 %}
-                                 {% set sigma_Mxd = (Msdx_c|abs / geom.W_x) if geom.W_x > TOL else 0 %}
-                                 {% set sigma_Myd = (Msdy_c|abs / geom.W_y) if geom.W_y > TOL else 0 %}
-                                 {% set nsd_c_abs_fmt = '%.2f'|format(Nsd_c|abs) %}
-                                 {% set sigma_ncd_fmt = '%.3f'|format(sigma_Ncd) %}
-                                 {# Verificando a fórmula inline - parece ok #}
-                                 <p class="passo-calculo"><span class="label">Tensão Normal Solicitante ($\sigma_{Ncd}$):</span> <span class="valor">{{ sigma_ncd_fmt }}</span> <span class="unidade">MPa</span> <span class="formula-inline">$ = \frac{ |{{ nsd_c_abs_fmt }}| }{ {{ area_fmt }} } $</span></p>
-                                 {% set msdx_c_abs_fmt = '%.2f'|format(Msdx_c|abs) %}
-                                 {% set sigma_mxd_fmt = '%.3f'|format(sigma_Mxd) %}
-                                 <p class="passo-calculo"><span class="label">Tensão Flexão X Solicitante ($\sigma_{Mxd}$):</span> <span class="valor">{{ sigma_mxd_fmt }}</span> <span class="unidade">MPa</span> <span class="formula-inline">$ = \frac{ |{{ msdx_c_abs_fmt }}| }{ {{ wx_fmt }} } $</span></p>
-                                 {% set msdy_c_abs_fmt = '%.2f'|format(Msdy_c|abs) %}
-                                 {% set sigma_myd_fmt = '%.3f'|format(sigma_Myd) %}
-                                 <p class="passo-calculo"><span class="label">Tensão Flexão Y Solicitante ($\sigma_{Myd}$):</span> <span class="valor">{{ sigma_myd_fmt }}</span> <span class="unidade">MPa</span> <span class="formula-inline">$ = \frac{ |{{ msdy_c_abs_fmt }}| }{ {{ wy_fmt }} } $</span></p>
-                                 {% set termo_N_sq = (sigma_Ncd / calc.f_c0d)**2 if calc.f_c0d > TOL else float('inf') %}
-                                 {% set termo_Mx = (sigma_Mxd / calc.f_md) if calc.f_md > TOL else float('inf') %}
-                                 {% set termo_My = (sigma_Myd / calc.f_md) if calc.f_md > TOL else float('inf') %}
-                                 <p class="passo-calculo"><span class="label">Termo $(\sigma_{Ncd}/f_{c0,d})^2$:</span> <span class="valor">{{ '%.3f'|format(termo_N_sq) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Termo $\sigma_{Mxd}/f_{m,d}$:</span> <span class="valor">{{ '%.3f'|format(termo_Mx) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Termo $\sigma_{Myd}/f_{m,d}$:</span> <span class="valor">{{ '%.3f'|format(termo_My) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Coeficiente ($k_M$):</span> <span class="valor">{{ km_fmt }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Ratio Resist. 1 ($N^2 + M_x + k_M M_y$):</span> <span class="valor">{{ '%.3f'|format(termo_N_sq + termo_Mx + fc_res.get('k_M_usado', calc.k_M) * termo_My) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Ratio Resist. 2 ($N^2 + k_M M_x + M_y$):</span> <span class="valor">{{ '%.3f'|format(termo_N_sq + fc_res.get('k_M_usado', calc.k_M) * termo_Mx + termo_My) }}</span></p>
-                                 <p class="resultado-check" style="border:none; text-align:left; padding:0; font-size: 1em;">
-                                     <span class="status-text">Verificação Resistência: Max(Ratio1, Ratio2) = {{ '%.3f'|format(fc_res.get('ratio', 9999)) }} $\le$ 1.0?</span>
-                                     {% if fc_res.get('passou') %} <span class="atende">(OK)</span>
-                                     {% elif fc_res.get('passou') == False %} <span class="nao-atende">(FALHA)</span>
-                                     {% else %} <span class="not-applicable">(N/A)</span> {% endif %}
-                                 </p>
-                                 <h5 style="margin-top: 20px;">Verificação da Estabilidade (Item 6.5.5)</h5>
-                                 {# Checa fórmula - ok #}
-                                 <div class="formula-generica">$$\frac{\sigma_{Nc0,d}}{k_{c,x} f_{c0,d}} + \frac{\sigma_{Mx,d}}{f_{m,d}} + k_M \frac{\sigma_{My,d}}{f_{m,d}} \le 1 \quad \text{e} \quad \frac{\sigma_{Nc0,d}}{k_{c,y} f_{c0,d}} + k_M \frac{\sigma_{Mx,d}}{f_{m,d}} + \frac{\sigma_{My,d}}{f_{m,d}} \le 1 \quad \text{e} \quad \lambda_{\text{max}} \le 140$$</div>
-                                 <p class="passo-calculo"><span class="label">Índice de Esbeltez ($\lambda_x, \lambda_y$):</span> <span class="valor">{{ '%.2f'|format(fc_est.get('lambda_x', 0)) }}, {{ '%.2f'|format(fc_est.get('lambda_y', 0)) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Esbeltez Relativa ($\lambda_{\text{rel},x}, \lambda_{\text{rel},y}$):</span> <span class="valor">{{ '%.3f'|format(fc_est.get('lambda_rel_x', 0)) }}, {{ '%.3f'|format(fc_est.get('lambda_rel_y', 0)) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Coeficiente de Redução ($k_{c,x}, k_{c,y}$):</span> <span class="valor">{{ '%.3f'|format(fc_est.get('kc_x', 1.0)) }}, {{ '%.3f'|format(fc_est.get('kc_y', 1.0)) }}</span></p>
-                                 {% set termo_N_kx = (sigma_Ncd / (fc_est.get('kc_x', 1) * calc.f_c0d)) if abs(fc_est.get('kc_x', 1) * calc.f_c0d) > TOL else float('inf') %}
-                                 {% set termo_N_ky = (sigma_Ncd / (fc_est.get('kc_y', 1) * calc.f_c0d)) if abs(fc_est.get('kc_y', 1) * calc.f_c0d) > TOL else float('inf') %}
-                                 <p class="passo-calculo"><span class="label">Termo Comp./$k_{c,x}$ ($\sigma_{Ncd} / (k_{c,x} f_{c0,d})$):</span> <span class="valor">{{ '%.3f'|format(termo_N_kx) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Termo Comp./$k_{c,y}$ ($\sigma_{Ncd} / (k_{c,y} f_{c0,d})$):</span> <span class="valor">{{ '%.3f'|format(termo_N_ky) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Ratio Estab. 1 ($N/k_{c,x} + M_x + k_M M_y$):</span> <span class="valor">{{ '%.3f'|format(termo_N_kx + termo_Mx + fc_est.get('k_M_usado', calc.k_M) * termo_My) }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Ratio Estab. 2 ($N/k_{c,y} + k_M M_x + M_y$):</span> <span class="valor">{{ '%.3f'|format(termo_N_ky + fc_est.get('k_M_usado', calc.k_M) * termo_Mx + termo_My) }}</span></p>
-                                 <p class="resultado-check" style="border:none; text-align:left; padding:0; font-size: 1em;">
-                                     <span class="status-text">Verificação Limite Esbeltez: $\lambda_{\text{max}} = {{ '%.2f'|format(fc_est.get('lambda_max', 999)) }} \le 140$?</span>
-                                     {% if fc_est.get('esbeltez_ok') %} <span class="atende">(OK)</span>
-                                     {% elif fc_est.get('esbeltez_ok') == False %} <span class="nao-atende">(FALHA)</span>
-                                     {% else %} <span class="not-applicable">(N/A)</span> {% endif %}
-                                 </p>
-                                  {% if fc_est.get('esbeltez_ok') %}
-                                      <p class="resultado-check" style="border:none; text-align:left; padding:0; font-size: 1em;">
-                                         <span class="status-text">Verificação Ratio (Estabilidade): Max(Ratio1, Ratio2) = {{ '%.3f'|format(fc_est.get('ratio', 9999)) }} $\le$ 1.0?</span>
-                                         {% if fc_est.get('passou_ratio_apenas') %} <span class="atende">(OK)</span>
-                                         {% elif fc_est.get('passou_ratio_apenas') == False %}<span class="nao-atende">(FALHA)</span>
-                                         {% else %}<span class="not-applicable">(N/A)</span> {% endif %}
-                                      </p>
-                                  {% endif %}
-                                 <div class="resultado-check">
-                                     <span class="status-text">Status Geral Flexocompressão:</span>
-                                     {% if passou %}<span class="atende">APROVADO</span>
-                                     {% elif passou == False %}<span class="nao-atende">REPROVADO</span>
-                                     {% else %}<span class="not-applicable">(N/A)</span>
+                             {% if chave_interna_elu == 'flexao_simples_reta' %}
+                                 {% set vx = v.get('x', {}) %} {% set vy = v.get('y', {}) %}
+                                 {% if vx.get('verificacao_aplicavel') %}
+                                     <h5>Flexão Reta em torno do Eixo X</h5>
+                                     <div class="formula-generica"><span class="math-block">$$\sigma_{M,x,d} = \frac{|M_{sd,x}|}{W_x} \le f_{m,d}$$</span></div>
+                                     <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,x}|$):</span> <span class="valor">{{ vx.get('Msd_formatado', 'N/A') }}</span> <span class="unidade">N.mm</span></p>
+                                     <p class="passo-calculo"><span class="label">Módulo de Resistência ($W_x$):</span> <span class="valor">{{ '%.0f'|format(geom.get('W_x',0.0)) }}</span> <span class="unidade">mm³</span></p>
+                                     <p class="passo-calculo"><span class="label">Resistência de Cálculo ($f_{m,d}$):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_md',0.0)) }}</span> <span class="unidade">MPa</span></p>
+                                     <p class="passo-calculo"><span class="label">Momento Resistente ($M_{Rd,x}$):</span> <span class="valor">{{ vx.get('MRd_formatado', 'N/A') }}</span> <span class="unidade">N.mm</span> <span class="formula-inline">$ = f_{m,d} \times W_x $</span></p>
+                                 {% endif %}
+                                 {% if vy.get('verificacao_aplicavel') %}
+                                     <h5 {% if vx.get('verificacao_aplicavel') %}style="margin-top: 20px;"{% endif %}>Flexão Reta em torno do Eixo Y</h5>
+                                     <div class="formula-generica"><span class="math-block">$$\sigma_{M,y,d} = \frac{|M_{sd,y}|}{W_y} \le f_{m,d}$$</span></div>
+                                     <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,y}|$):</span> <span class="valor">{{ vy.get('Msd_formatado', 'N/A') }}</span> <span class="unidade">N.mm</span></p>
+                                     <p class="passo-calculo"><span class="label">Módulo de Resistência ($W_y$):</span> <span class="valor">{{ '%.0f'|format(geom.get('W_y',0.0)) }}</span> <span class="unidade">mm³</span></p>
+                                     <p class="passo-calculo"><span class="label">Resistência de Cálculo ($f_{m,d}$):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_md',0.0)) }}</span> <span class="unidade">MPa</span></p>
+                                     <p class="passo-calculo"><span class="label">Momento Resistente ($M_{Rd,y}$):</span> <span class="valor">{{ vy.get('MRd_formatado', 'N/A') }}</span> <span class="unidade">N.mm</span> <span class="formula-inline">$ = f_{m,d} \times W_y $</span></p>
+                                 {% endif %}
+                                  {% if v.get('is_combined_case') %}
+                                     {% if resultados.mostrar_verificacoes.get('flexao_obliqua') or resultados.mostrar_verificacoes.get('flexotracao') or resultados.mostrar_verificacoes.get('flexocompressao') %}
+                                        <p class="warning-info">(Nota: Caso combinado também aplicável/selecionado. Verifique a seção correspondente.)</p>
                                      {% endif %}
+                                 {% endif %}
+                            {% endif %}
+
+                            {% if chave_interna_elu == 'flexao_obliqua' %}
+                                 <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,x}|$):</span> <span class="valor">{{ '%.2f'|format(abs(v.get('Msdx',0.0))) }}</span> <span class="unidade">N.mm</span></p>
+                                 <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,y}|$):</span> <span class="valor">{{ '%.2f'|format(abs(v.get('Msdy',0.0))) }}</span> <span class="unidade">N.mm</span></p>
+                                 <h5>Fórmulas de Interação (Item 6.3.5):</h5>
+                                 <div class="formula-generica" style="text-align: left; padding-left: 30px;">
+                                     1) <span class="math-inline">$\quad \frac{\sigma_{Mx,d}}{f_{m,d}} + k_M \frac{\sigma_{My,d}}{f_{m,d}} = \frac{|M_{sd,x}|}{f_{m,d} W_x} + k_M \frac{|M_{sd,y}|}{f_{m,d} W_y} = $</span> {{ v.get('ratio1_fo_formatado', 'N/A') }} $\le 1.0$ <br><br>
+                                     2) <span class="math-inline">$\quad k_M \frac{\sigma_{Mx,d}}{f_{m,d}} + \frac{\sigma_{My,d}}{f_{m,d}} = k_M \frac{|M_{sd,x}|}{f_{m,d} W_x} + \frac{|M_{sd,y}|}{f_{m,d} W_y} = $</span> {{ v.get('ratio2_fo_formatado', 'N/A') }} $\le 1.0$
                                  </div>
-                             {% endif %}
+                                 <p class="passo-calculo"><span class="label">Resistência ($f_{m,d}$):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_md', 1.0)) }}</span> <span class="unidade">MPa</span></p>
+                                 <p class="passo-calculo"><span class="label">Módulos ($W_x, W_y$):</span> <span class="valor">{{ '%.0f'|format(geom.get('W_x', 1.0)) }}, {{ '%.0f'|format(geom.get('W_y', 1.0)) }}</span> <span class="unidade">mm³</span></p>
+                                 <p class="passo-calculo"><span class="label">Coeficiente ($k_M$):</span> <span class="valor">{{ '%.1f'|format(v.get('k_M_usado',1.0)) }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Termo Flexão X ($|M_{sd,x}|/M_{Rd,x}$):</span> <span class="valor">{{ v.get('termo_Mx_formatado', 'N/A') }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Termo Flexão Y ($|M_{sd,y}|/M_{Rd,y}$):</span> <span class="valor">{{ v.get('termo_My_formatado', 'N/A') }}</span></p>
+                            {% endif %}
 
-                             {# CISALHAMENTO #}
-                             {% if chave_interna == 'cisalhamento' %}
-                                {% set vsd_fmt = '%.2f'|format(v.Vsd) %}
-                                {% set area_fmt = '%.1f'|format(geom.area) %}
-                                {% set fvd_fmt = '%.2f'|format(calc.f_vd) %}
-                                {% set tau_d = (1.5 * v.Vsd|abs / geom.area) if geom.area > TOL else 0 %}
-                                {% set vrd_fmt = '%.2f'|format(v.VRd) %}
-                                {% set vsd_abs_fmt = '%.2f'|format(v.Vsd|abs) %}
-                                <div class="formula-generica">$$\tau_{d} = 1.5 \frac{|V_{sd}|}{A} \le f_{vd}$$</div>
-                                <p class="passo-calculo"><span class="label">Força Cortante Solicitante ($V_{sd}$):</span> <span class="valor">{{ vsd_fmt }}</span> <span class="unidade">N</span></p>
-                                <p class="passo-calculo"><span class="label">Área ($A$):</span> <span class="valor">{{ area_fmt }}</span> <span class="unidade">mm²</span></p>
-                                <p class="passo-calculo"><span class="label">Resistência de Cálculo ($f_{vd}$):</span> <span class="valor">{{ fvd_fmt }}</span> <span class="unidade">MPa</span></p>
-                                <p class="passo-calculo"><span class="label">Tensão Cisalhante Máxima ($\tau_{d}$):</span> <span class="valor">{{ '%.3f'|format(tau_d) }}</span> <span class="unidade">MPa</span> <span class="formula-inline">$ = 1.5 \times \frac{ |{{ vsd_abs_fmt }}| }{ {{ area_fmt }} } $</span></p>
-                                <div class="formula-generica">$$V_{Rd} = \frac{f_{vd} \times A}{1.5}$$</div>
-                                <p class="passo-calculo"><span class="label">Força Cortante Resistente ($V_{Rd}$):</span> <span class="valor">{{ vrd_fmt }}</span> <span class="unidade">N</span> <span class="formula-inline">$ = \frac{ {{ fvd_fmt }} \times {{ area_fmt }} }{1.5} $</span></p>
-                                <div class="resultado-check">
-                                    <span class="status-text">Verificação: $|V_{sd}| \le V_{Rd}$ ?</span>
-                                    {% if passou %}<span class="atende">APROVADO</span>{% elif passou == False %}<span class="nao-atende">REPROVADO</span>{% else %}<span class="not-applicable">(N/A)</span>{% endif %}
-                                    <br> <span style="font-size: 0.9em; font-weight: normal;">(${{ vsd_abs_fmt }} \le {{ vrd_fmt }}$ N)</span>
-                                </div>
-                             {% endif %}
+                            {% if chave_interna_elu == 'flexotracao' %}
+                                 <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,x}|$):</span> <span class="valor">{{ '%.2f'|format(abs(v.get('Msdx',0.0))) }}</span> <span class="unidade">N.mm</span></p>
+                                 <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,y}|$):</span> <span class="valor">{{ '%.2f'|format(abs(v.get('Msdy',0.0))) }}</span> <span class="unidade">N.mm</span></p>
+                                 <p class="passo-calculo"><span class="label">Força Normal Solicitante ($N_{sd,t0}$):</span> <span class="valor">{{ '%.2f'|format(v.get('Nsd',0.0)) }}</span> <span class="unidade">N</span></p>
+                                 <h5>Fórmulas de Interação (Item 6.3.6):</h5>
+                                 <div class="formula-generica" style="text-align: left; padding-left: 30px;">
+                                     1) <span class="math-inline">$\frac{\sigma_{t0,d}}{f_{t0,d}} + \frac{\sigma_{Mx,d}}{f_{m,d}} + k_M \frac{\sigma_{My,d}}{f_{m,d}} = \frac{N_{sd,t0}}{f_{t0,d} A} + \frac{|M_{sd,x}|}{f_{m,d} W_x} + k_M \frac{|M_{sd,y}|}{f_{m,d} W_y} = $</span> {{ v.get('ratio1_ft_formatado', 'N/A') }} $\le 1.0 $ <br><br>
+                                     2) <span class="math-inline">$\frac{\sigma_{t0,d}}{f_{t0,d}} + k_M \frac{\sigma_{Mx,d}}{f_{m,d}} + \frac{\sigma_{My,d}}{f_{m,d}} = \frac{N_{sd,t0}}{f_{t0,d} A} + k_M \frac{|M_{sd,x}|}{f_{m,d} W_x} + \frac{|M_{sd,y}|}{f_{m,d} W_y} = $</span> {{ v.get('ratio2_ft_formatado', 'N/A') }} $\le 1.0 $
+                                 </div>
+                                 <p class="passo-calculo"><span class="label">Resistências ($f_{m,d}, f_{t0,d}$):</span> <span class="valor">{{ '%.2f'|format(calc.get('f_md', 1.0)) }}, {{ '%.2f'|format(calc.get('f_t0d', 1.0)) }}</span> <span class="unidade">MPa</span></p>
+                                 <p class="passo-calculo"><span class="label">Módulos ($W_x, W_y$), Área ($A$):</span> <span class="valor">{{ '%.0f'|format(geom.get('W_x', 1.0)) }}, {{ '%.0f'|format(geom.get('W_y', 1.0)) }}, {{ '%.1f'|format(geom.get('area', 1.0)) }}</span> <span class="unidade">mm³/mm²</span></p>
+                                 <p class="passo-calculo"><span class="label">Coeficiente ($k_M$):</span> <span class="valor">{{ '%.1f'|format(v.get('k_M_usado',1.0)) }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Termo Tração ($N_{sd}/N_{Rd}$):</span> <span class="valor">{{ v.get('termo_N_formatado', 'N/A') }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Termo Flexão X ($|M_{sd,x}|/M_{Rd,x}$):</span> <span class="valor">{{ v.get('termo_Mx_formatado', 'N/A') }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Termo Flexão Y ($|M_{sd,y}|/M_{Rd,y}$):</span> <span class="valor">{{ v.get('termo_My_formatado', 'N/A') }}</span></p>
+                            {% endif %}
 
-                            {# ESTABILIDADE LATERAL #}
-                            {% if chave_interna == 'estabilidade_lateral' %}
-                                 {% set l1_fmt = '%.0f'|format(resultados.L1_mm) %}
-                                 {% set b_fmt = '%.1f'|format(resultados.largura_mm) %}
-                                 {% set hb_ratio_fmt = '%.2f'|format(v.get('h_b_ratio', 0)) %}
-                                 {% set betaM_fmt = '%.2f'|format(v.get('beta_M', 0)) %}
-                                 {% set E0ef_fmt = '%.0f'|format(v.get('E0_ef', 0)) %}
-                                 {% set fmd_fmt = '%.2f'|format(calc.f_md) %}
-                                 {% set kmod_fmt = '%.2f'|format(calc.k_mod) %}
-                                 {% set E0med_fmt = '%.0f'|format(calc.E_0med) %}
-                                 {% set L1b_fmt = '%.2f'|format(v.get('L1_b', 0)) %}
-                                 {% set lim_disp_fmt = '%.2f'|format(v.get('limite_dispensacao', 0)) %}
-                                 <p class="passo-calculo"><span class="label">Distância entre Travamentos ($L_1$):</span> <span class="valor">{{ l1_fmt }}</span> <span class="unidade">mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Largura da Seção ($b$):</span> <span class="valor">{{ b_fmt }}</span> <span class="unidade">mm</span></p>
-                                 <p class="passo-calculo"><span class="label">Relação $h/b$:</span> <span class="valor">{{ hb_ratio_fmt }}</span></p>
-                                 <p class="passo-calculo"><span class="label">Coeficiente $\beta_M$ (Tabela 8, interpolado):</span> <span class="valor">{{ betaM_fmt }}</span></p>
-                                 <div class="formula-generica">$$E_{0,\text{ef}} = k_{\text{mod}} \times E_{0,\text{med}}$$</div>
-                                 <p class="passo-calculo"><span class="label">Módulo Elasticidade Efetivo ($E_{0,\text{ef}}$):</span> <span class="valor">{{ E0ef_fmt }}</span> <span class="unidade">MPa</span> <span class="formula-inline">$ = {{ kmod_fmt }} \times {{ E0med_fmt }} $</span></p>
-                                 <p class="passo-calculo"><span class="label">Resistência Flexão ($f_{m,d}$):</span> <span class="valor">{{ fmd_fmt }}</span> <span class="unidade">MPa</span></p>
-                                 <div class="formula-generica">$$\text{Verificação de Dispensa (Item 6.5.6): } \frac{L_1}{b} \le \frac{E_{0,\text{ef}}}{\beta_M f_{m,d}}$$</div>
-                                 <p class="passo-calculo"><span class="label">Termo Esquerdo ($L_1/b$):</span> <span class="valor">{{ L1b_fmt }}</span> <span class="formula-inline">$ = \frac{ {{ l1_fmt }} }{ {{ b_fmt }} } $</span></p>
-                                 {% set E0ef_fmt_disp = '%.0f'|format(v.get('E0_ef', 0)) %}
-                                 {% set betaM_fmt_disp = '%.2f'|format(v.get('beta_M', 1)) %}
-                                 {% set fmd_fmt_disp = '%.2f'|format(calc.f_md) %}
-                                 <p class="passo-calculo"><span class="label">Termo Direito (Limite Dispensa):</span> <span class="valor">{{ lim_disp_fmt }}</span> <span class="formula-inline">$ = \frac{ {{ E0ef_fmt_disp }} }{ {{ betaM_fmt_disp }} \times {{ fmd_fmt_disp }} } $</span></p>
+                            {% if chave_interna_elu == 'compressao_simples_resistencia' %}
+                                 {% set v_est_comp_det = resultados.verificacoes.get('compressao_estabilidade', {}) %}
+                                 <h5>Resistência da Seção (Item 6.3.3)</h5>
+                                 <div class="formula-generica"><span class="math-block">$$\sigma_{c0,d} = \frac{N_{sd,c0}}{A} \le f_{c0,d} \quad \implies \quad N_{sd,c0} \le f_{c0,d} \times A = N_{Rd,c0,\text{res}}$$</span></div>
+                                 <p class="passo-calculo"><span class="label">Força Solicitante ($N_{sd,c0}$):</span> <span class="valor">{{ v.get('Nsd_formatado', 'N/A') }}</span> <span class="unidade">N</span></p>
+                                 <p class="passo-calculo"><span class="label">Força Resistente ($N_{Rd,c0,\text{res}}$):</span> <span class="valor">{{ v.get('NRd_res_formatado', 'N/A') }}</span> <span class="unidade">N</span></p>
 
-                                 {% if v.get('dispensado') %}
-                                     <div class="resultado-check">
-                                        <span class="status-text">Verificação Dispensa: {{ L1b_fmt }} $\le$ {{ lim_disp_fmt }}?</span>
-                                        <span class="dispensado-status">DISPENSADO</span>
-                                     </div>
-                                 {% else %}
-                                     {% set msdx_abs_fmt_flb = '%.2f'|format(esforcos.Msdx|abs) %}
-                                     {% set wx_fmt_flb = '%.0f'|format(geom.W_x) %}
-                                     {% set sigma_cd_fmt_flb = '%.2f'|format(v.get('sigma_cd_atuante', 0)) %}
-                                     {% set sigma_adm_fmt_flb = '%.2f'|format(v.get('sigma_cd_max_adm', 0)) %}
-                                     {% set E0ef_fmt_flb = '%.0f'|format(v.get('E0_ef', 0)) %}
-                                     {% set L1b_fmt_flb = '%.2f'|format(v.get('L1_b', 1)) %}
-                                     {% set betaM_fmt_flb = '%.2f'|format(v.get('beta_M', 1)) %}
+                                 <h5 style="margin-top: 20px;">Estabilidade (Item 6.5.5)</h5>
+                                 <p class="passo-calculo"><span class="label">Comprimento de Flambagem ($L_{0,x}, L_{0,y}$):</span>
+                                    <span class="valor"> $K_{e,x}L = {{'%.0f'|format(resultados.Ke_x * resultados.comprimento_mm)}}$, $K_{e,y}L = {{'%.0f'|format(resultados.Ke_y * resultados.comprimento_mm)}}$ </span> <span class="unidade">mm</span></p>
+                                 <div class="formula-generica"><span class="math-block">$$\lambda_i = \frac{L_{0,i}}{i_i} \quad ; \quad \lambda_{rel,i} = \frac{\lambda_i}{\pi} \sqrt{\frac{f_{c0k}}{E_{0,05}}}$$</span></div>
+                                 <p class="passo-calculo"><span class="label">Índice de Esbeltez ($\lambda_x, \lambda_y$):</span> <span class="valor">{{ '%.2f'|format(v_est_comp_det.get('lambda_x',0.0)) }}, {{ '%.2f'|format(v_est_comp_det.get('lambda_y',0.0)) }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Esbeltez Relativa ($\lambda_{\text{rel},x}, \lambda_{\text{rel},y}$):</span> <span class="valor">{{ '%.3f'|format(v_est_comp_det.get('lambda_rel_x',0.0)) }}, {{ '%.3f'|format(v_est_comp_det.get('lambda_rel_y',0.0)) }}</span></p>
+                                 <div class="formula-generica"><span class="math-block">$$k_i = 0.5 \left[ 1 + \beta_c (\lambda_{rel,i} - 0.3) + \lambda_{rel,i}^2 \right]$$</span> <small>(Para $\lambda_{rel,i} > 0.3$)</small></div>
+                                 <div class="formula-generica"><span class="math-block">$$k_{c,i} = \frac{1}{k_i + \sqrt{k_i^2 - \lambda_{rel,i}^2}} \le 1.0$$</span> <small>(Para $\lambda_{rel,i} > 0.3$, senão $k_{c,i}=1.0$)</small></div>
+                                 <p class="passo-calculo"><span class="label">Coeficiente de Redução ($k_{c,x}, k_{c,y}$):</span> <span class="valor">{{ '%.3f'|format(v_est_comp_det.get('kc_x',0.0)) }}, {{ '%.3f'|format(v_est_comp_det.get('kc_y',0.0)) }}</span></p>
+                                 <div class="formula-generica"><span class="math-block">$$N_{sd,c0} \le k_{c,\text{min}} \times f_{c0,d} \times A = N_{Rd,c0,\text{est}}$$</span> <small>(Verificar também $\lambda_{\text{max}} \le 140$)</small></div>
+                                 <p class="passo-calculo"><span class="label">Força Solicitante ($N_{sd,c0}$):</span> <span class="valor">{{ v_est_comp_det.get('Nsd_formatado', 'N/A') }}</span> <span class="unidade">N</span></p>
+                                 <p class="passo-calculo"><span class="label">Força Resistente (Estabilidade) ($N_{Rd,c0,\text{est}}$):</span> <span class="valor">{{ v_est_comp_det.get('NRd_est_formatado', 'N/A') }}</span> <span class="unidade">N</span></p>
+                                 {% if not v_est_comp_det.get('esbeltez_ok', True) %}
+                                     <p class="passo-calculo" style="color: var(--cor-erro);"><span class="label">Limite de Esbeltez:</span> <span class="valor">NÃO ATENDIDO ($\lambda_{max} = {{'%.2f'|format(v_est_comp_det.get('lambda_max',0))}} > 140$)</span></p>
+                                 {% endif %}
+                                 {% if v.get('is_combined_case') and resultados.mostrar_verificacoes.get('flexocompressao') %}<p class="warning-info">(Nota: Flexocompressão também aplicável/selecionada. Verifique a seção correspondente.)</p>{% endif %}
+                            {% endif %}
 
-                                     <p class="passo-calculo" style="border-bottom: 1px dashed #ccc; font-weight:bold;"><span class="label">Resultado Dispensa:</span> <span class="valor" style="background:none; color:inherit;">Verificação Necessária</span></p>
-                                     <h5>Verificação Alternativa (Item 6.5.6)</h5>
-                                     {# Fórmula revisada e labels/verificações correspondentes #}
-                                     <div class="formula-generica">$$\sigma_{c,d} = \frac{|M_{sd,x}|}{W_x} \le \frac{E_{0,\text{ef}}}{(L_1/b) \cdot \beta_M} = \sigma_{c,d,\text{adm}}$$</div>
-                                     <p class="passo-calculo"><span class="label">Momento Solicitante ($|M_{sd,x}|$):</span> <span class="valor">{{ msdx_abs_fmt_flb }}</span> <span class="unidade">N.mm</span></p>
-                                     <p class="passo-calculo"><span class="label">Módulo Resistente ($W_x$):</span> <span class="valor">{{ wx_fmt_flb }}</span> <span class="unidade">mm³</span></p>
-                                     <p class="passo-calculo"><span class="label">Tensão Compressão Atuante ($\sigma_{c,d}$):</span> <span class="valor">{{ sigma_cd_fmt_flb }}</span> <span class="unidade">MPa</span> <span class="formula-inline">$ = \frac{ |{{ msdx_abs_fmt_flb }}| }{ {{ wx_fmt_flb }} } $</span></p>
-                                     <p class="passo-calculo"><span class="label">Tensão Compressão Admissível ($\sigma_{c,d,\text{adm}}$):</span> <span class="valor">{{ sigma_adm_fmt_flb }}</span> <span class="unidade">MPa</span> <span class="formula-inline">$ = \frac{ {{ E0ef_fmt_flb }} }{ {{ L1b_fmt_flb }} \times {{ betaM_fmt_flb }} } $</span></p>
-                                     <div class="resultado-check">
-                                        <span class="status-text">Verificação Alternativa: $\sigma_{c,d} \le \sigma_{c,d,\text{adm}}$ ?</span>
-                                        {% if passou %}<span class="atende">APROVADO</span>{% elif passou == False %}<span class="nao-atende">REPROVADO</span>{% else %}<span class="not-applicable">(N/A)</span>{% endif %}
-                                        <br> <span style="font-size: 0.9em; font-weight: normal;">(${{ sigma_cd_fmt_flb }} \le {{ sigma_adm_fmt_flb }}$ MPa)</span>
-                                     </div>
+                            {% if chave_interna_elu == 'flexocompressao' %}
+                                 {% set v_res_fc_det = v.get('resistencia', {}) %}
+                                 {% set v_est_fc_det = v.get('estabilidade', {}) %}
+                                 <h5>Verificação da Resistência (Item 6.3.7)</h5>
+                                 <div class="formula-generica" style="text-align: left; padding-left: 30px;">
+                                     1) <span class="math-inline">$\left( \frac{\sigma_{Nc0,d}}{f_{c0,d}} \right)^2 + \frac{\sigma_{Mx,d}}{f_{m,d}} + k_M \frac{\sigma_{My,d}}{f_{m,d}} = $</span> {{ v_res_fc_det.get('ratio1_fc_res_formatado', 'N/A') }} $\le 1.0$ <br><br>
+                                     2) <span class="math-inline">$\left( \frac{\sigma_{Nc0,d}}{f_{c0,d}} \right)^2 + k_M \frac{\sigma_{Mx,d}}{f_{m,d}} + \frac{\sigma_{My,d}}{f_{m,d}} = $</span> {{ v_res_fc_det.get('ratio2_fc_res_formatado', 'N/A') }} $\le 1.0$
+                                 </div>
+                                  <p class="passo-calculo"><span class="label">Termo Compressão ao Quadrado ($(\sigma_{Nc0,d}/f_{c0,d})^2$):</span> <span class="valor">{{ v_res_fc_det.get('termo_N_quad_formatado', 'N/A') }}</span></p>
+                                  <p class="passo-calculo"><span class="label">Termo Flexão X ($\sigma_{Mx,d}/f_{m,d}$):</span> <span class="valor">{{ v_res_fc_det.get('termo_Mx_fmd_formatado', 'N/A') }}</span></p>
+                                  <p class="passo-calculo"><span class="label">Termo Flexão Y ($\sigma_{My,d}/f_{m,d}$):</span> <span class="valor">{{ v_res_fc_det.get('termo_My_fmd_formatado', 'N/A') }}</span></p>
+                                  <p class="passo-calculo"><span class="label">Valor da Expressão (Máximo Resistência):</span> <span class="valor">{{ v_res_fc_det.get('ratio_formatado', 'N/A') }}</span></p>
+                                  <p class="passo-calculo"><span class="label">Limite Admissível:</span> <span class="valor">1.000</span></p>
+                                 
+                                 <h5 style="margin-top: 20px;">Verificação da Estabilidade (Item 6.5.5)</h5>
+                                 <div class="formula-generica" style="text-align: left; padding-left: 30px;">
+                                     1) <span class="math-inline">$\frac{\sigma_{Nc0,d}}{k_{c,x} f_{c0,d}} + \frac{\sigma_{Mx,d}}{f_{m,d}} + k_M \frac{\sigma_{My,d}}{f_{m,d}} = $</span> {{ v_est_fc_det.get('ratio1_fc_est_formatado', 'N/A') }} $\le 1.0$ <br><br>
+                                     2) <span class="math-inline">$\frac{\sigma_{Nc0,d}}{k_{c,y} f_{c0,d}} + k_M \frac{\sigma_{Mx,d}}{f_{m,d}} + \frac{\sigma_{My,d}}{f_{m,d}} = $</span> {{ v_est_fc_det.get('ratio2_fc_est_formatado', 'N/A') }} $\le 1.0$
+                                     <br><small>(Considerando também $\lambda_{\text{max}} \le 140$)</small>
+                                 </div>
+                                 <p class="passo-calculo"><span class="label">Índice de Esbeltez ($\lambda_x, \lambda_y$):</span> <span class="valor">{{ '%.2f'|format(v_est_fc_det.get('lambda_x',0.0)) }}, {{ '%.2f'|format(v_est_fc_det.get('lambda_y',0.0)) }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Coeficiente de Redução ($k_{c,x}, k_{c,y}$):</span> <span class="valor">{{ '%.3f'|format(v_est_fc_det.get('kc_x',0.0)) }}, {{ '%.3f'|format(v_est_fc_det.get('kc_y',0.0)) }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Termo Normal X ($\sigma_{Nc0,d}/(k_{c,x}f_{c0,d})$):</span> <span class="valor">{{ v_est_fc_det.get('termo_N_kcx_formatado', 'N/A') }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Termo Normal Y ($\sigma_{Nc0,d}/(k_{c,y}f_{c0,d})$):</span> <span class="valor">{{ v_est_fc_det.get('termo_N_kcy_formatado', 'N/A') }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Termo Flexão X ($\sigma_{Mx,d}/f_{m,d}$):</span> <span class="valor">{{ v_est_fc_det.get('termo_Mx_fmd_formatado', 'N/A') }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Termo Flexão Y ($\sigma_{My,d}/f_{m,d}$):</span> <span class="valor">{{ v_est_fc_det.get('termo_My_fmd_formatado', 'N/A') }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Valor da Expressão (Máximo Estabilidade):</span> <span class="valor">{{ v_est_fc_det.get('ratio_formatado', 'N/A') }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Limite Admissível:</span> <span class="valor">1.000</span></p>
+                                 {% if not v_est_fc_det.get('esbeltez_ok', True) %}
+                                     <p class="passo-calculo" style="color: var(--cor-erro);"><span class="label">Limite de Esbeltez:</span> <span class="valor">NÃO ATENDIDO ($\lambda_{max} = {{'%.2f'|format(v_est_fc_det.get('lambda_max',0))}} > 140$)</span></p>
+                                 {% endif %}
+                            {% endif %}
+
+                           {% if chave_interna_elu == 'estabilidade_lateral' %}
+                                 <p class="passo-calculo"><span class="label">Relação $h/b$:</span> <span class="valor">{{ '%.2f'|format(v.get('h_b_ratio',0.0)) }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Coeficiente $\beta_M$ (Tabela 8):</span> <span class="valor">{{ '%.2f'|format(v.get('beta_M',0.0)) }}</span></p>
+                                 <div class="formula-generica"><span class="math-block">$$\text{Dispensa se: } \frac{L_1}{b} \le \frac{E_{0,ef}}{\beta_M f_{m,d}}$$</span> <small>(NBR 7190 Eq. 17)</small></div>
+                                 <p class="passo-calculo"><span class="label">Termo Esquerdo ($L_1/b$):</span> <span class="valor">{{ '%.2f'|format(v.get('L1_b',0.0)) }}</span></p>
+                                 <p class="passo-calculo"><span class="label">Termo Direito (Limite Dispensa):</span> <span class="valor">{{ '%.2f'|format(v.get('limite_dispensacao',0.0)) }}</span></p>
+                                 {% if not v.get('dispensado') %}
+                                     <h5 style="margin-top:15px">Verificação Alternativa (NBR 7190 Eq. 18)</h5>
+                                     <div class="formula-generica"><span class="math-block">$$\sigma_{c,d} = \frac{|M_{sd,x}|}{W_x} \le \frac{E_{0,ef}}{(L_1/b) \cdot \beta_M} = \sigma_{c,d,\text{adm}}$$</span></div>
+                                     <p class="passo-calculo"><span class="label">Tensão Compressão Atuante ($\sigma_{c,d}$):</span> <span class="valor">{{ v.get('sigma_cd_atuante_formatado', 'N/A') }}</span> <span class="unidade">MPa</span></p>
+                                     <p class="passo-calculo"><span class="label">Tensão Compressão Admissível ($\sigma_{c,d,\text{adm}}$):</span> <span class="valor">{{ v.get('sigma_cd_max_adm_formatado', 'N/A') }}</span> <span class="unidade">MPa</span></p>
                                  {% endif %}
                              {% endif %}
+                         {% endif %} 
+                         <div class="resultado-check">
+                             <span class="status-text">Status Verificação ({{ titulo_elu.split('(')[0].strip() }}):</span>
+                             {% if houve_erro_elu %} <span class="erro-status">ERRO</span>
+                             {% elif dispensado_elu %} <span class="dispensado-status">DISPENSADO</span>
+                             {% elif passou_geral_elu %} <span class="atende">APROVADO</span>
+                             {% elif passou_geral_elu is false %} <span class="nao-atende">REPROVADO</span>
+                             {% else %} <span class="not-applicable">(N/A)</span>
+                             {% endif %}
+                         </div>
+                         {% set valor_solicitante_formatado = "N/A" %}
+                         {% set valor_resistente_formatado = "N/A" %}
+                         {% set sufixo_comparacao = "" %}
+                         {% set ratio_final_formatado = v.get('ratio_formatado', 'N/A') %}
 
-                            {% endif %} {# Fim if not houve_erro #}
-                            {# --- Rodapé do Bloco de Verificação --- #}
-                             <div class="resultado-check" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc;">
-                                 <span class="status-text">Status Verificação ({{ titulo.split('(')[0].strip() }}):</span>
-                                 {% if houve_erro %}
-                                     <span class="erro-status">ERRO</span>
-                                 {% elif chave_interna == 'estabilidade_lateral' and v.get('dispensado') %}
-                                     <span class="dispensado-status">DISPENSADO</span>
-                                 {% elif passou %}
-                                     <span class="atende">APROVADO</span>
-                                 {% elif passou == False %}
-                                     <span class="nao-atende">REPROVADO</span>
-                                 {% else %}
-                                     <span class="not-applicable">(NÃO APLICÁVEL / INDISPONÍVEL)</span>
-                                 {% endif %}
-                             </div>
-                         </div> {# Fim calculo-detalhe #}
-                     {% endif %} {# Fim if mostrar_este_bloco #}
-                {% endif %} {# Fim if resultados.mostrar_verificacoes #}
-            {% endfor %} {# Fim loop verificacao_map #}
-
-            {# Mensagem se nenhuma verificação foi aplicável/mostrada #}
-            {% if not alguma_verificacao_mostrada %}
-                 <div class="calculo-detalhe">
-                     <p class="not-applicable">Nenhuma das verificações selecionadas foi aplicável para os esforços informados.</p>
+                         {% if chave_interna_elu in ['tracao_simples', 'tracao_perpendicular', 'compressao_perpendicular', 'cisalhamento'] %}
+                             {% set valor_solicitante_formatado = v.get('Nsd_formatado', v.get('Vsd_formatado', 'N/A')) %}
+                             {% set valor_resistente_formatado = v.get('NRd_formatado', v.get('VRd_formatado', 'N/A')) %}
+                             {% set sufixo_comparacao = " N" %}
+                         {% elif chave_interna_elu == 'flexao_simples_reta' %}
+                             {% set vx_f = v.get('x', {}) %} {% set vy_f = v.get('y', {}) %}
+                             {% set ratio_final_formatado = "X: " ~ vx_f.get('ratio_formatado','N/A') ~ " / Y: " ~ vy_f.get('ratio_formatado','N/A') %}
+                              {% if vx_f.get('verificacao_aplicavel') %}
+                                  {% set valor_solicitante_formatado = vx_f.get('Msd_formatado', 'N/A') %}
+                                  {% set valor_resistente_formatado = vx_f.get('MRd_formatado', 'N/A') %}
+                                  {% set sufixo_comparacao = " N.mm (X)" %}
+                              {% elif vy_f.get('verificacao_aplicavel') %}
+                                  {% set valor_solicitante_formatado = vy_f.get('Msd_formatado', 'N/A') %}
+                                  {% set valor_resistente_formatado = vy_f.get('MRd_formatado', 'N/A') %}
+                                  {% set sufixo_comparacao = " N.mm (Y)" %}
+                              {% endif %}
+                         {% elif chave_interna_elu == 'compressao_simples_resistencia' %}
+                             {% set v_res_comp = resultados.verificacoes.get('compressao_simples_resistencia', {}) %}
+                             {% set v_est_comp = resultados.verificacoes.get('compressao_estabilidade', {}) %}
+                             {% set valor_solicitante_formatado = v_res_comp.get('Nsd_formatado', 'N/A') %}
+                             {% set valor_resistente_formatado = v_res_comp.get('NRd_res_formatado', 'N/A') %}
+                             {% set sufixo_comparacao = " N (Resist.)" %}
+                             {% if v_est_comp.get('verificacao_aplicavel') %}
+                                {% if not v_est_comp.get('esbeltez_ok', True) %}
+                                    {% set ratio_final_formatado = "λ > 140" %}
+                                {% else %}
+                                    {% set ratio_final_formatado = v_res_comp.get('ratio_formatado', 'N/A') ~ " (Res) / " ~ v_est_comp.get('ratio_formatado', 'N/A') ~ " (Est)" %}
+                                {% endif %}
+                             {% endif %}
+                         {% elif chave_interna_elu in ['flexao_obliqua', 'flexotracao'] %}
+                             {% set valor_solicitante_formatado = v.get('ratio_formatado', 'N/A') %}
+                             {% set valor_resistente_formatado = "1.000" %}
+                         {% elif chave_interna_elu == 'flexocompressao' %}
+                             {% set v_res_fc = v.get('resistencia',{}) %}
+                             {% set v_est_fc = v.get('estabilidade',{}) %}
+                             {% set valor_solicitante_formatado = "Res: " ~ v_res_fc.get('ratio_formatado', 'N/A') ~ " / Est: " ~ v_est_fc.get('ratio_formatado', 'N/A') %}
+                             {% set valor_resistente_formatado = "1.000" %}
+                              {% if not v_est_fc.get('esbeltez_ok', True) %} 
+                                {% set valor_solicitante_formatado = valor_solicitante_formatado ~ " (λ>140)" %}
+                                {% set ratio_final_formatado = "λ > 140" %}
+                              {% else %}
+                                {% set ratio_final_formatado = v_res_fc.get('ratio_formatado', 'N/A') ~ " (Res) / " ~ v_est_fc.get('ratio_formatado', 'N/A') ~ " (Est)" %}
+                              {% endif %}
+                         {% elif chave_interna_elu == 'estabilidade_lateral' and not dispensado_elu %}
+                             {% set valor_solicitante_formatado = v.get('sigma_cd_atuante_formatado', 'N/A') %}
+                             {% set valor_resistente_formatado = v.get('sigma_cd_max_adm_formatado', 'N/A') %}
+                             {% set sufixo_comparacao = " MPa" %}
+                         {% endif %}
+                         
+                         {% if valor_solicitante_formatado != "N/A" and valor_resistente_formatado != "N/A" and not dispensado_elu and not houve_erro_elu and chave_interna_elu != 'dimensoes' %}
+                            <p style="text-align:right; font-size: 0.9em; margin-top: 5px; border:none;">
+                                Verificação: 
+                                <span style="font-weight:bold;">
+                                    {% if chave_interna_elu in ['flexao_obliqua', 'flexotracao', 'flexocompressao'] %}
+                                        {{ valor_solicitante_formatado }} &le; {{ valor_resistente_formatado }}
+                                    {% else %}
+                                         {{ valor_solicitante_formatado }}{{ sufixo_comparacao }} &le; {{ valor_resistente_formatado }}{{ sufixo_comparacao }}
+                                    {% endif %}
+                                </span>
+                                (Razão Principal: {{ ratio_final_formatado }})
+                            </p>
+                         {% elif dispensado_elu %}
+                             <p style="text-align:right; font-size: 0.9em; margin-top: 5px; border:none;">(Dispensado de verificação numérica)</p>
+                         {% endif %}
+                     </div> 
+                 {% endif %} 
+            {% endfor %} 
+            {% if not alguma_verificacao_elu_renderizada_flag %}
+                 <div class="calculo-detalhe no-verifications-notice">
+                     <p>Nenhuma das verificações ELU selecionadas foi aplicável para os esforços informados ou não foram selecionadas para exibição.</p>
                  </div>
             {% endif %}
         </div>
 
-        {# --- Seção 5: Resultado Geral Final --- #}
-        <div class="resultado-secao">
-             <h2>5. Resultado Geral Final</h2>
-             {# Substitua pelo conteúdo real da seção 5 #}
-             <p>Resumo dos resultados e status final...</p>
-        </div>
-
-        {# --- Seção 6: Botões --- #}
         <div class="botao-container" style="text-align: center; margin-top: 40px;">
-             {# Substitua pelos botões reais da seção 6 #}
-             <button onclick="window.print()">Imprimir / Salvar PDF</button>
+             <button onclick="window.print()" class="botao botao-secundario no-print">Imprimir / Salvar PDF</button>
+             <a href="{{ url_for('formulario') }}" class="botao botao-principal">Novo Cálculo</a>
+             <a href="{{ url_for('inicio') }}" class="botao botao-secundario">Tela Inicial</a>
         </div>
-    </div> {# Fim container #}
+    </div> 
 </body>
 </html>
