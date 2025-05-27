@@ -7,6 +7,7 @@
     <title>Novo Dimensionamento - LignumCalc</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script>
+        // Configuração do MathJax para renderizar LaTeX
         MathJax = {
           tex: {
             inlineMath: [['$', '$'], ['\\(', '\\)']],
@@ -20,6 +21,7 @@
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <style>
+        /* Estilos para checkboxes (opcional, podem estar no style.css) */
         .checkbox-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -71,7 +73,7 @@
                         <span class="error-message" id="classe_madeira-erro"></span>
                     </div>
                     <div>
-                        <label for="classe_carregamento">Classe de Carregamento:</label>
+                        <label for="classe_carregamento">Classe de Carregamento (p/ $k_{mod}$):</label>
                         <select id="classe_carregamento" name="classe_carregamento" required>
                             <option value="">Selecione...</option>
                             <option value="permanente">Permanente</option>
@@ -101,7 +103,7 @@
                 <div class="form-grid">
                     <div>
                         <label for="largura_mm">Largura (b) <span class="unidade">[mm]</span>:</label>
-                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="largura_mm" name="largura_mm" required placeholder="Ex: 60">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="largura_mm" name="largura_mm" required placeholder="Ex: 80">
                         <span class="error-message" id="largura_mm-erro"></span>
                     </div>
                     <div>
@@ -111,13 +113,13 @@
                     </div>
                      <div>
                         <label for="comprimento">Comprimento (L) <span class="unidade">[m]</span>:</label>
-                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="comprimento" name="comprimento" required placeholder="Ex: 3.5">
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="comprimento" name="comprimento" required placeholder="Ex: 3.0">
                         <span class="error-message" id="comprimento-erro"></span>
                     </div>
                      <div>
                          <label for="tipo_peca_dim">Tipo de Peça (Dim. Mínimas):</label>
                          <select id="tipo_peca_dim" name="tipo_peca_dim" required>
-                            <option value="principal_isolada" selected title="Peça única fundamental para estabilidade/segurança (viga principal, pilar).">Principal Isolada</option>
+                            <option value="principal_isolada" title="Peça única fundamental para estabilidade/segurança (viga principal, pilar).">Principal Isolada</option>
                             <option value="secundaria_isolada" title="Peça única de menor importância, apoiada em principais (terça, barrote).">Secundária Isolada</option>
                             <option value="principal_multipla" title="Elemento fundamental formado por ≥2 peças justapostas.">Principal Múltipla</option>
                             <option value="secundaria_multipla" title="Elemento secundário formado por ≥2 peças justapostas.">Secundária Múltipla</option>
@@ -129,8 +131,8 @@
             </fieldset>
 
             <fieldset>
-                <legend>3. Esforços Solicitantes de Cálculo (Sd)</legend>
-                 <p style="font-size: 0.9em; color: #555;"><i>(Insira os valores máximos obtidos das combinações de ações. Use 0 se o esforço não existir.)</i></p>
+                <legend>3. Esforços Solicitantes de Cálculo (ELU)</legend>
+                 <p style="font-size: 0.9em; color: #555;"><i>(Valores máximos das combinações últimas. Use 0 se não houver.)</i></p>
                  <div class="form-grid">
                      <div>
                         <label for="tracao_paralela_sd">Tração Paralela ($N_{sd,t0}$) <span class="unidade">[N]</span>:</label>
@@ -146,7 +148,6 @@
                         <label for="tracao_perpendicular_sd">Tração Perpendicular ($N_{sd,t90}$) <span class="unidade">[N]</span>:</label>
                         <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="tracao_perpendicular_sd" name="tracao_perpendicular_sd" required value="0">
                         <span class="error-message" id="tracao_perpendicular_sd-erro"></span>
-                        <small>(Verificação agora impacta resultado)</small>
                     </div>
                      <div>
                         <label for="compressao_perpendicular_sd">Compressão Perpendicular ($N_{sd,c90}$) <span class="unidade">[N]</span>:</label>
@@ -155,24 +156,48 @@
                     </div>
                     <div>
                         <label for="forca_cortante_sd">Força Cortante ($V_{sd}$) <span class="unidade">[N]</span>:</label>
-                         <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="forca_cortante_sd" name="forca_cortante_sd" required value="0">
-                        <span class="error-message" id="forca_cortante_sd-erro"></span>
+                         <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="forca_cortante_sd" name="forca_cortante_sd" required value="0"> <span class="error-message" id="forca_cortante_sd-erro"></span>
+                        <small>(Usar o valor máximo em módulo)</small>
                     </div>
                      <div>
                         <label for="momento_x_sd">Momento Fletor ($M_{sd,x}$) <span class="unidade">[N.m]</span>:</label>
-                        <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="momento_x_sd" name="momento_x_sd" required value="0" placeholder="(Em torno do eixo X local)">
-                        <span class="error-message" id="momento_x_sd-erro"></span>
+                        <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="momento_x_sd" name="momento_x_sd" required value="0"> <span class="error-message" id="momento_x_sd-erro"></span>
+                        <small>(Em torno do eixo X local. Usar valor máx.)</small>
                     </div>
                     <div>
                         <label for="momento_y_sd">Momento Fletor ($M_{sd,y}$) <span class="unidade">[N.m]</span>:</label>
-                        <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="momento_y_sd" name="momento_y_sd" required value="0" placeholder="(Em torno do eixo Y local)">
-                        <span class="error-message" id="momento_y_sd-erro"></span>
+                        <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="momento_y_sd" name="momento_y_sd" required value="0"> <span class="error-message" id="momento_y_sd-erro"></span>
+                        <small>(Em torno do eixo Y local. Usar valor máx.)</small>
                     </div>
                  </div>
             </fieldset>
 
              <fieldset>
-                <legend>4. Parâmetros de Estabilidade</legend>
+                 <legend>4. Esforços Solicitantes para Verificação de Flechas (ELS)</legend>
+                 <p style="font-size: 0.9em; color: #555;"><i>(Valores das combinações de serviço. Use 0 se não houver. Sinais importam para flechas.)</i></p>
+                 <div class="form-grid">
+                     <div>
+                        <label for="carga_els_qp_y">Carga ELS Quase Permanente (eixo Y, $q_{qp,y}$) <span class="unidade">[N/m]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="carga_els_qp_y" name="carga_els_qp_y" required value="0"> <span class="error-message" id="carga_els_qp_y-erro"></span>
+                        <small>(Carga total Gk + $\psi_2$Qk para Comb. Quase Permanente)</small>
+                    </div>
+                     <div>
+                        <label for="carga_els_qp_x">Carga ELS Quase Permanente (eixo X, $q_{qp,x}$) <span class="unidade">[N/m]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="carga_els_qp_x" name="carga_els_qp_x" required value="0"> <span class="error-message" id="carga_els_qp_x-erro"></span>
+                    </div>
+                    <div>
+                        <label for="carga_els_vento_y">Carga ELS Vento Sucção (eixo Y, $q_{vento,y}$) <span class="unidade">[N/m]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="carga_els_vento_y" name="carga_els_vento_y" required value="0"> <span class="error-message" id="carga_els_vento_y-erro"></span>
+                         <small>(Ex: Carga nominal do vento para Comb. Vento)</small>
+                    </div>
+                     <div>
+                        <label for="carga_els_vento_x">Carga ELS Vento Sucção (eixo X, $q_{vento,x}$) <span class="unidade">[N/m]</span>:</label>
+                        <input type="text" inputmode="numeric" pattern="-?[0-9]*[.,]?[0-9]+" id="carga_els_vento_x" name="carga_els_vento_x" required value="0"> <span class="error-message" id="carga_els_vento_x-erro"></span>
+                    </div>
+                 </div>
+             </fieldset>
+             <fieldset>
+                <legend>5. Parâmetros de Estabilidade (ELU)</legend>
                 <div class="form-grid">
                     <div>
                         <label for="Ke_x">Coef. Flambagem ($K_{e,x}$):</label>
@@ -187,7 +212,7 @@
                          <small>(Relativo ao eixo Y local. Ex: 1.0 bi-articulado)</small>
                     </div>
                      <div>
-                        <label for="tipo_madeira_beta_c">Tipo para $\beta_c$ (Estabilidade):</label>
+                        <label for="tipo_madeira_beta_c">Tipo Madeira (p/ $\beta_c$):</label>
                         <select id="tipo_madeira_beta_c" name="tipo_madeira_beta_c" required>
                             <option value="serrada" selected>Serrada / Roliça ($\beta_c=0.2$)</option>
                             <option value="mlc">MLC / MLCC / LVL ($\beta_c=0.1$)</option>
@@ -195,37 +220,35 @@
                         <span class="error-message" id="tipo_madeira_beta_c-erro"></span>
                     </div>
                     <div>
-                        <label for="alpha_n">Fator $\alpha_n$:</label>
+                        <label for="alpha_n">Fator $\alpha_n$ (Comp. Perp.):</label>
                         <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="alpha_n" name="alpha_n" required value="1.0">
                         <span class="error-message" id="alpha_n-erro"></span>
                          <small>(Tabela 6 NBR 7190. Usado em $f_{c90,d}$)</small>
                     </div>
                     <div>
                         <label for="L1_mm">Dist. Travamento Lateral Borda Comprimida ($L_1$) <span class="unidade">[mm]</span>:</label>
-                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="L1_mm" name="L1_mm" required value="0" placeholder="Entre apoios ou travessas">
-                        <span class="error-message" id="L1_mm-erro"></span>
-                        <small>(Obrigatório > 0 se $M_{sd,x} \ne 0$. Usar L se não houver travamento interm. Ref item 6.5.6)</small>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*[.,]?[0-9]+" id="L1_mm" name="L1_mm" required value="0" placeholder="Entre apoios ou travessas"> <span class="error-message" id="L1_mm-erro"></span>
+                        <small>(Usar L se não houver travamento interm. Ref item 6.5.6)</small>
                     </div>
                  </div>
             </fieldset>
 
             <fieldset>
-                <legend>5. Verificações a Incluir no Relatório</legend>
-                <p style="font-size: 0.9em; color: #555;"><i>Selecione as verificações que deseja visualizar no relatório final. A estabilidade será incluída automaticamente se houver compressão.</i></p>
+                <legend>6. Verificações a Incluir no Relatório</legend>
+                <p style="font-size: 0.9em; color: #555;"><i>(Selecione as verificações desejadas. Estabilidade é incluída com Compressão/Flexocompressão.)</i></p>
                 <div class="checkbox-grid">
-                     <div><input type="checkbox" id="chk_dimensoes" name="verificacoes_selecionadas" value="dimensoes" checked><label for="chk_dimensoes">Dimensões Mínimas</label></div>
+                     <div><input type="checkbox" id="chk_dimensoes" name="verificacoes_selecionadas" value="dimensoes"><label for="chk_dimensoes">Dimensões Mínimas</label></div>
                      <div><input type="checkbox" id="chk_tracao_paralela" name="verificacoes_selecionadas" value="tracao_simples"><label for="chk_tracao_paralela">Tração Paralela</label></div>
                      <div><input type="checkbox" id="chk_tracao_perpendicular" name="verificacoes_selecionadas" value="tracao_perpendicular"><label for="chk_tracao_perpendicular">Tração Perpendicular</label></div>
-                     {# --- LABEL ALTERADO AQUI --- #}
-                     <div><input type="checkbox" id="chk_compressao_simples" name="verificacoes_selecionadas" value="compressao_simples_resistencia"><label for="chk_compressao_simples">Compressão Paralela</label></div>
-                     {# --------------------------- #}
+                     <div><input type="checkbox" id="chk_compressao_simples" name="verificacoes_selecionadas" value="compressao_simples_resistencia"><label for="chk_compressao_simples">Compressão Paralela (Resist. + Estab.)</label></div>
                      <div><input type="checkbox" id="chk_compressao_perpendicular" name="verificacoes_selecionadas" value="compressao_perpendicular"><label for="chk_compressao_perpendicular">Compressão Perpendicular</label></div>
                      <div><input type="checkbox" id="chk_flexao_reta" name="verificacoes_selecionadas" value="flexao_simples_reta"><label for="chk_flexao_reta">Flexão Reta</label></div>
                      <div><input type="checkbox" id="chk_flexao_obliqua" name="verificacoes_selecionadas" value="flexao_obliqua"><label for="chk_flexao_obliqua">Flexão Oblíqua</label></div>
                      <div><input type="checkbox" id="chk_flexotracao" name="verificacoes_selecionadas" value="flexotracao"><label for="chk_flexotracao">Flexotração</label></div>
-                     <div><input type="checkbox" id="chk_flexocompressao" name="verificacoes_selecionadas" value="flexocompressao"><label for="chk_flexocompressao">Flexocompressão</label></div>
+                     <div><input type="checkbox" id="chk_flexocompressao" name="verificacoes_selecionadas" value="flexocompressao"><label for="chk_flexocompressao">Flexocompressão (Resist. + Estab.)</label></div>
                      <div><input type="checkbox" id="chk_cisalhamento_vigas" name="verificacoes_selecionadas" value="cisalhamento"><label for="chk_cisalhamento_vigas">Cisalhamento</label></div>
-                     <div><input type="checkbox" id="chk_estabilidade_lateral" name="verificacoes_selecionadas" value="estabilidade_lateral"><label for="chk_estabilidade_lateral">Estabilidade Lateral</label></div>
+                     <div><input type="checkbox" id="chk_estabilidade_lateral" name="verificacoes_selecionadas" value="estabilidade_lateral"><label for="chk_estabilidade_lateral">Estabilidade Lateral (Viga)</label></div>
+                     <div><input type="checkbox" id="chk_flechas_els" name="verificacoes_selecionadas" value="flechas_els"><label for="chk_flechas_els">Flechas (ELS)</label></div>
                 </div>
                 <span class="error-message" id="verificacoes_selecionadas-erro"></span>
             </fieldset>
@@ -238,21 +261,20 @@
         </form>
     </div>
 
-    {# Script Javascript (sem alterações, apenas para validação e população do select) #}
+    {# Script Javascript para validação e população do select #}
     <script>
        // Função de validação principal
         function validarFormulario() {
             var formularioValido = true;
             var primeiroErro = null;
 
-            // IDs dos campos numéricos
+            // IDs dos campos numéricos (incluindo os novos de ELS)
             var camposNumericos = [
                 'largura_mm', 'altura_mm', 'comprimento',
                 'tracao_paralela_sd', 'compressao_paralela_sd', 'tracao_perpendicular_sd',
-                'compressao_perpendicular_sd',
-                'forca_cortante_sd', 'momento_x_sd', 'momento_y_sd',
-                'Ke_x', 'Ke_y', 'alpha_n',
-                'L1_mm'
+                'compressao_perpendicular_sd', 'forca_cortante_sd', 'momento_x_sd', 'momento_y_sd',
+                'carga_els_qp_y', 'carga_els_qp_x', 'carga_els_vento_y', 'carga_els_vento_x', // <-- NOVOS CAMPOS ELS
+                'Ke_x', 'Ke_y', 'alpha_n', 'L1_mm'
             ];
              // Lista de IDs dos campos de seleção
              var camposSelect = ['tipo_tabela', 'classe_madeira', 'classe_carregamento', 'classe_umidade', 'tipo_madeira_beta_c', 'tipo_peca_dim'];
@@ -271,20 +293,28 @@
                 var erroElemento = document.getElementById(campoId + '-erro');
                 if (input && erroElemento) {
                     var permiteZero = true;
-                    var permiteNegativo = false;
+                    var permiteNegativo = false; // Default: não permite negativo
 
                     // Definições específicas por campo
                     if (['largura_mm', 'altura_mm', 'comprimento', 'Ke_x', 'Ke_y', 'alpha_n'].includes(campoId)) permiteZero = false;
-                    if (['forca_cortante_sd', 'momento_x_sd', 'momento_y_sd'].includes(campoId)) permiteNegativo = true;
+                    // Permite negativo para cortante, momentos e cargas ELS
+                    if (['forca_cortante_sd', 'momento_x_sd', 'momento_y_sd',
+                         'carga_els_qp_y', 'carga_els_qp_x', 'carga_els_vento_y', 'carga_els_vento_x' ].includes(campoId)) {
+                        permiteNegativo = true;
+                    }
+                    // L1 deve ser > 0 se Mx != 0 (verificação de estabilidade lateral)
                     if (campoId === 'L1_mm') {
+                        permiteZero = false; // L1 não pode ser zero para verificação de estabilidade lateral
                         var momentoXInput = document.getElementById('momento_x_sd');
                         var momentoXValorStr = momentoXInput ? momentoXInput.value.trim().replace(',', '.') : '0';
                         var momentoXValor = parseFloat(momentoXValorStr) || 0;
-                         if (Math.abs(momentoXValor) > 1e-6) permiteZero = false; // L1 > 0 se Mx != 0
+                         // Se Mx for zero, L1 pode ser zero (verificação não aplicável), então relaxamos a restrição de não-zero
+                         if (Math.abs(momentoXValor) < 1e-6) permiteZero = true;
                     }
                     if (['tracao_paralela_sd', 'compressao_paralela_sd', 'tracao_perpendicular_sd', 'compressao_perpendicular_sd'].includes(campoId)) {
                         permiteZero = true; permiteNegativo = false;
                     }
+
 
                     if (!validarEFormatarNumero(input, erroElemento, permiteZero, permiteNegativo)) {
                         formularioValido = false;
@@ -307,7 +337,7 @@
             var checkboxes = document.querySelectorAll('input[name="verificacoes_selecionadas"]:checked');
             if (checkboxes.length === 0) {
                  var erroCheckboxElement = document.getElementById('verificacoes_selecionadas-erro');
-                 erroCheckboxElement.textContent = 'Selecione ao menos uma verificação para incluir no relatório.';
+                 if (erroCheckboxElement) erroCheckboxElement.textContent = 'Selecione ao menos uma verificação para incluir no relatório.';
                  formularioValido = false;
                  if (!primeiroErro) {
                      var primeiroCheckbox = document.querySelector('input[name="verificacoes_selecionadas"]');
@@ -328,24 +358,29 @@
         // Função auxiliar para validar e formatar números
          function validarEFormatarNumero(input, erroElemento, permitir_zero = true, permitir_negativo = true) {
             var valor = input.value.trim();
-            var nomeCampo = input.labels[0] ? input.labels[0].innerText.replace(':', '').trim() : input.id;
+            var nomeCampo = input.labels && input.labels[0] ? input.labels[0].innerText.replace(':', '').trim() : input.id;
 
              if (valor === "") {
                  if (permitir_zero) { input.value = '0'; erroElemento.textContent = ''; return true; }
                  else { erroElemento.textContent = `O campo '${nomeCampo}' é obrigatório e não pode ser zero.`; return false; }
              }
             var valorFormatado = valor.replace(/\s/g, '').replace(',', '.');
+             // Regex ajustado para permitir sinal negativo opcional
              var regex_str = permitir_negativo ? '^-?\\d*\\.?\\d+$' : '^\\d*\\.?\\d+$';
              var regex_num = new RegExp(regex_str);
-             if (!regex_num.test(valorFormatado)) { erroElemento.textContent = `Valor inválido para '${nomeCampo}'. Use números e ponto (.) como separador decimal.`; return false; }
-            var valorFloat = parseFloat(valorFormatado);
+
+             if (!regex_num.test(valorFormatado)) {
+                 erroElemento.textContent = `Valor inválido para '${nomeCampo}'. Use números${permitir_negativo ? ' (com sinal opcional -)' : ''} e ponto (.) como separador decimal.`;
+                 return false;
+              }
+             var valorFloat = parseFloat(valorFormatado);
              if (isNaN(valorFloat)) { erroElemento.textContent = `Valor numérico inválido para '${nomeCampo}'.`; return false; }
              if (!permitir_zero && Math.abs(valorFloat) < 1e-9) { erroElemento.textContent = `O campo '${nomeCampo}' não pode ser zero.`; return false; }
              if (!permitir_negativo && valorFloat < -1e-9) { erroElemento.textContent = `O campo '${nomeCampo}' não pode ser negativo.`; return false; }
              // Validação específica de range
-             if(input.id === 'alpha_n' && (valorFloat < 1.0 || valorFloat > 2.0)) { erroElemento.textContent = '$\alpha_n$ deve estar entre 1.0 e 2.0.'; return false; }
-             if((input.id === 'Ke_x' || input.id === 'Ke_y') && valorFloat < 0.5) { erroElemento.textContent = '$K_e$ deve ser ≥ 0.5.'; return false; }
-             if (input.id === 'L1_mm' && !permitir_zero && valorFloat <= 1e-9) { erroElemento.textContent = '$L_1$ deve ser > 0 quando $M_{sd,x} \ne 0$.'; return false; }
+             if(input.id === 'alpha_n' && (valorFloat < 1.0 || valorFloat > 2.0)) { erroElemento.textContent = 'α_n deve estar entre 1.0 e 2.0.'; return false; }
+             if((input.id === 'Ke_x' || input.id === 'Ke_y') && valorFloat < 0.5) { erroElemento.textContent = 'K_e deve ser ≥ 0.5.'; return false; }
+             if (input.id === 'L1_mm' && !permitir_zero && valorFloat <= 1e-9) { erroElemento.textContent = 'L₁ deve ser > 0 quando Msd,x ≠ 0.'; return false; }
              if (['largura_mm', 'altura_mm', 'comprimento'].includes(input.id) && valorFloat <= 1e-9) { erroElemento.textContent = `O campo '${nomeCampo}' deve ser maior que zero.`; return false; }
 
             input.value = valorFormatado; // Atualiza o campo com o valor formatado
@@ -365,40 +400,66 @@
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('dimensionamento-form');
             if(!form) return;
-             var inputsParaValidar = form.querySelectorAll('input[type="text"], select');
+
+            // Define os campos a serem validados
+            var inputsParaValidar = form.querySelectorAll('input[type="text"], select');
+
              inputsParaValidar.forEach(function(input) {
-                 var eventType = input.tagName === 'SELECT' ? 'change' : 'input'; // 'input' é melhor que 'blur' para feedback imediato
+                 var eventType = input.tagName === 'SELECT' ? 'change' : 'input'; // 'input' para feedback imediato em texto
                  input.addEventListener(eventType, function() {
                     var erroElemento = document.getElementById(this.id + '-erro');
-                    if (!erroElemento) return; // Sai se não encontrar elemento de erro
+                    if (!erroElemento) return;
+
                     if (this.tagName === 'SELECT') {
                          validarCampoSelect(this, erroElemento);
-                         // Atualiza classes de madeira se o tipo de tabela mudar
                          if (this.id === 'tipo_tabela') { popularClassesMadeira(this.value); }
                      } else {
-                         // Revalida número ao digitar/colar
-                         var permiteZero = true, permiteNegativo = false;
-                         if (['largura_mm', 'altura_mm', 'comprimento', 'Ke_x', 'Ke_y', 'alpha_n'].includes(this.id)) permiteZero = false;
-                         if (['forca_cortante_sd', 'momento_x_sd', 'momento_y_sd'].includes(this.id)) permiteNegativo = true;
-                         if (this.id === 'L1_mm') {
-                             var mX = parseFloat(document.getElementById('momento_x_sd').value.replace(',','.')) || 0;
-                             if (Math.abs(mX) > 1e-6) permiteZero = false;
+                         // Determina permissões de zero/negativo para validação live
+                         var permiteZeroLive = true;
+                         var permiteNegativoLive = false;
+                         if (['largura_mm', 'altura_mm', 'comprimento', 'Ke_x', 'Ke_y', 'alpha_n'].includes(this.id)) permiteZeroLive = false;
+                         if (['forca_cortante_sd', 'momento_x_sd', 'momento_y_sd',
+                              'carga_els_qp_y', 'carga_els_qp_x', 'carga_els_vento_y', 'carga_els_vento_x'].includes(this.id)) {
+                             permiteNegativoLive = true;
                          }
-                         validarEFormatarNumero(this, erroElemento, permiteZero, permiteNegativo);
+                         if (this.id === 'L1_mm') {
+                             permiteZeroLive = false;
+                             var mXInput = document.getElementById('momento_x_sd');
+                             var mXVal = parseFloat(mXInput ? mXInput.value.replace(',', '.') : '0') || 0;
+                             if (Math.abs(mXVal) < 1e-6) permiteZeroLive = true; // Permite zero se Mx for zero
+                         }
+                         if (['tracao_paralela_sd', 'compressao_paralela_sd', 'tracao_perpendicular_sd', 'compressao_perpendicular_sd'].includes(this.id)) {
+                              permiteZeroLive = true; permiteNegativoLive = false;
+                         }
+                         validarEFormatarNumero(this, erroElemento, permiteZeroLive, permiteNegativoLive);
                      }
                  });
              });
-             // Popula inicialmente as classes de madeira com base no valor padrão/selecionado
+             // Popula inicialmente as classes de madeira
              var tipoTabelaInicial = document.getElementById('tipo_tabela').value;
-             popularClassesMadeira(tipoTabelaInicial || ''); // Usa '' se nenhum valor inicial
+             popularClassesMadeira(tipoTabelaInicial || 'nativa'); // Default para 'nativa' se vazio
+             // Define a classe D20 como selecionada por padrão se 'nativa' estiver ativo
+             if (document.getElementById('tipo_tabela').value === 'nativa') {
+                 setTimeout(() => { // Pequeno timeout para garantir que as opções foram carregadas
+                      document.getElementById('classe_madeira').value = 'D20';
+                 }, 100);
+             }
+
+             // Adiciona valores padrão do exercício (se necessário, pode remover ou ajustar)
+             document.getElementById('tipo_tabela').value = 'nativa';
+             popularClassesMadeira('nativa'); // Garante que D20 esteja disponível
+             setTimeout(() => { document.getElementById('classe_madeira').value = 'D20'; }, 100);
+             document.getElementById('classe_carregamento').value = 'permanente';
+             document.getElementById('classe_umidade').value = 'classe_1';
+             // Valores do exercício pré-preenchidos nos inputs correspondentes
         });
 
         // Função para popular o select de Classe da Madeira
          function popularClassesMadeira(tipo) {
              var classeSelect = document.getElementById('classe_madeira');
-             var valorAtual = classeSelect.value; // Salva o valor selecionado anteriormente, se houver
-             classeSelect.innerHTML = '<option value="">Selecione...</option>'; // Limpa opções existentes
-             // Mapeamento de tipos para classes (mantido como estava)
+             if (!classeSelect) return;
+             var valorAtual = classeSelect.value;
+             classeSelect.innerHTML = '<option value="">Selecione...</option>';
              var classes = {
                 "estrutural": {
                     "Coníferas (Tabela 3)": ['C14', 'C16', 'C18', 'C20', 'C22', 'C24', 'C27', 'C30', 'C35', 'C40', 'C45', 'C50'],
@@ -406,7 +467,6 @@
                 },
                 "nativa": { "Nativas (Tabela 2)": ['D20', 'D30', 'D40', 'D50', 'D60'] }
              };
-             // Adiciona as novas opções baseadas no tipo selecionado
              if (tipo && classes[tipo]) {
                 for (var grupo in classes[tipo]) {
                     var optgroup = document.createElement('optgroup');
@@ -415,10 +475,8 @@
                     classeSelect.appendChild(optgroup);
                 }
              }
-             // Tenta restaurar a seleção anterior se ela ainda for válida
              var valorValido = Array.from(classeSelect.options).some(opt => opt.value === valorAtual);
-             classeSelect.value = valorValido ? valorAtual : ""; // Restaura ou deixa em "Selecione..."
-             // Revalida o campo select após mudar as opções
+             classeSelect.value = valorValido ? valorAtual : "";
              validarCampoSelect(classeSelect, document.getElementById('classe_madeira-erro'));
          }
     </script>
